@@ -1,6 +1,6 @@
 MIDlet-Name: Sarge
 MIDlet-Version: 1.0.0
 MIDlet-Vendor: FIRST
-MIDlet-1: RobotBase, , org.TexasTorque.Sarge.RobotBase
+MIDlet-1: Robot, , org.TexasTorque.Sarge.Robot
 MicroEdition-Profile: IMP-1.0
 MicroEdition-Configuration: CLDC-1.1
