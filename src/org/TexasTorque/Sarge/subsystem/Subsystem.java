@@ -1,5 +1,8 @@
 package org.TexasTorque.Sarge.subsystem;
 
+import org.TexasTorque.Sarge.feedback.FeedbackSystem;
+import org.TexasTorque.Sarge.input.InputSystem;
+
 public abstract class Subsystem {
 
     protected InputSystem input;
