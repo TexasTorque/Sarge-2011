@@ -1,16 +1,18 @@
 package org.TexasTorque.Sarge.subsystem;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.TexasTorque.Sarge.constants.Constants;
 
 public class Drivebase extends Subsystem {
 
-    private final Jaguar leftBack;
+    private final Jaguar leftRear;
     private final Jaguar leftFront;
-    private final Jaguar rightBack;
+    private final Jaguar rightRear;
     private final Jaguar rightFront;
-    private final Solenoid shifterSolenoid;
+    private final DoubleSolenoid shifterSolenoid;
     private final Solenoid dropdriveSolenoid;
 
     private double leftSpeed;
@@ -19,13 +21,13 @@ public class Drivebase extends Subsystem {
     private boolean dropCenter;
 
     public Drivebase() {
-        leftBack = new Jaguar(0);
-        leftFront = new Jaguar(0);
-        rightBack = new Jaguar(0);
-        rightFront = new Jaguar(0);
+        leftRear = new Jaguar(Constants.REAR_LEFT_DRIVE);
+        leftFront = new Jaguar(Constants.FRONT_LEFT_DRIVE);
+        rightRear = new Jaguar(Constants.REAR_RIGHT_DRIVE);
+        rightFront = new Jaguar(Constants.FRONT_RIGHT_DRIVE);
 
-        shifterSolenoid = new Solenoid(0);
-        dropdriveSolenoid = new Solenoid(0);
+        shifterSolenoid = new DoubleSolenoid(Constants.SHIFTER_PORT_A, Constants.SHIFTER_PORT_B);
+        dropdriveSolenoid = new Solenoid(Constants.DROPDRIVE_PORT);
     }
 
     public void update() {
@@ -35,11 +37,11 @@ public class Drivebase extends Subsystem {
         dropCenter = input.isDropCenter();
 
         if (outputEnabled) {
-            leftBack.set(leftSpeed);
+            leftRear.set(leftSpeed);
             leftFront.set(leftSpeed);
-            rightBack.set(rightSpeed);
+            rightRear.set(rightSpeed);
             rightFront.set(rightSpeed);
-            shifterSolenoid.set(highGear);
+            shifterSolenoid.set(highGear ? DoubleSolenoid.Value.kForward : DoubleSolenoid.Value.kReverse);
             dropdriveSolenoid.set(dropCenter);
         }
     }

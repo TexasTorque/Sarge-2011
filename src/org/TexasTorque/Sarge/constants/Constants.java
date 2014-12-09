@@ -10,4 +10,5 @@ public class Constants {
     public static final int PRESSURE_SWITCH = 13;
     public static final int SHIFTER_PORT_A = 3;
     public static final int SHIFTER_PORT_B = 4;
+    public static final int DROPDRIVE_PORT = 2;
 }
