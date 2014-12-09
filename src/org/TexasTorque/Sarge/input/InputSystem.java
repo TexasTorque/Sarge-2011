@@ -1,6 +1,6 @@
 package org.TexasTorque.Sarge.input;
 
-public abstract class InputSystem {
+public abstract class InputSystem implements Runnable {
 
     //Drivebase
     protected volatile double leftSpeed;
