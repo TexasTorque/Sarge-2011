@@ -6,6 +6,7 @@ public abstract class InputSystem {
     protected volatile double leftSpeed;
     protected volatile double rightSpeed;
     protected volatile boolean isHighGear;
+    protected volatile boolean isDropCenter;
 
     public synchronized double getLeftSpeed() {
         return leftSpeed;
@@ -15,7 +16,12 @@ public abstract class InputSystem {
         return rightSpeed;
     }
 
-    public synchronized boolean getGear() {
+    public synchronized boolean isHighGear() {
         return isHighGear;
     }
+
+    public synchronized boolean isDropCenter() {
+        return isDropCenter;
+    }
+
 }

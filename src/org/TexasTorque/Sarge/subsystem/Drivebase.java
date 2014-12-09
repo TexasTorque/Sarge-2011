@@ -2,6 +2,7 @@ package org.TexasTorque.Sarge.subsystem;
 
 import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drivebase extends Subsystem {
 
@@ -28,8 +29,27 @@ public class Drivebase extends Subsystem {
     }
 
     public void update() {
+        leftSpeed = input.getLeftSpeed();
+        rightSpeed = input.getRightSpeed();
+        highGear = input.isHighGear();
+        dropCenter = input.isDropCenter();
+
+        if (outputEnabled) {
+            leftBack.set(leftSpeed);
+            leftFront.set(leftSpeed);
+            rightBack.set(rightSpeed);
+            rightFront.set(rightSpeed);
+            shifterSolenoid.set(highGear);
+            dropdriveSolenoid.set(dropCenter);
+        }
     }
 
     public void pushToDashboard() {
+        SmartDashboard.putNumber("leftSpeed", leftSpeed);
+        SmartDashboard.putNumber("rightSpeed", rightSpeed);
+
+        SmartDashboard.putBoolean("highGear", highGear);
+        SmartDashboard.getBoolean("dropCenter", dropCenter);
+
     }
 }
