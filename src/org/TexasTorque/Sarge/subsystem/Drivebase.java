@@ -5,13 +5,14 @@ import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.TexasTorque.Sarge.constants.Constants;
+import org.TexasTorque.Torquelib.component.Motor;
 
 public class Drivebase extends Subsystem {
 
-    private final Jaguar leftRear;
-    private final Jaguar leftFront;
-    private final Jaguar rightRear;
-    private final Jaguar rightFront;
+    private final Motor leftRear;
+    private final Motor leftFront;
+    private final Motor rightRear;
+    private final Motor rightFront;
     private final DoubleSolenoid shifterSolenoid;
     private final Solenoid dropdriveSolenoid;
 
@@ -21,10 +22,10 @@ public class Drivebase extends Subsystem {
     private boolean dropCenter;
 
     public Drivebase() {
-        leftRear = new Jaguar(Constants.REAR_LEFT_DRIVE);
-        leftFront = new Jaguar(Constants.FRONT_LEFT_DRIVE);
-        rightRear = new Jaguar(Constants.REAR_RIGHT_DRIVE);
-        rightFront = new Jaguar(Constants.FRONT_RIGHT_DRIVE);
+        leftRear = new Motor(new Jaguar(Constants.REAR_LEFT_DRIVE), false);
+        leftFront = new Motor(new Jaguar(Constants.FRONT_LEFT_DRIVE), false);
+        rightRear = new Motor(new Jaguar(Constants.REAR_RIGHT_DRIVE), true);
+        rightFront = new Motor(new Jaguar(Constants.FRONT_RIGHT_DRIVE), true);
 
         shifterSolenoid = new DoubleSolenoid(Constants.SHIFTER_PORT_A, Constants.SHIFTER_PORT_B);
         dropdriveSolenoid = new Solenoid(Constants.DROPDRIVE_PORT);
