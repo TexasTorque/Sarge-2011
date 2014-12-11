@@ -1,5 +1,6 @@
 package org.TexasTorque.Sarge;
 
+import edu.wpi.first.wpilibj.Compressor;
 import org.TexasTorque.Sarge.feedback.FeedbackSystem;
 import org.TexasTorque.Sarge.feedback.SensorFeedback;
 import org.TexasTorque.Sarge.input.DriverInput;
@@ -15,6 +16,7 @@ public class Robot extends TorqueIterative {
     SensorFeedback sensorFeedback;
     
     Drivebase drivebase;
+    Compressor compressor;
     
     public void robotInit() {
         driverInput = new DriverInput();
@@ -22,6 +24,8 @@ public class Robot extends TorqueIterative {
         sensorFeedback = new SensorFeedback();
         
         drivebase = new Drivebase();
+        compressor = new Compressor(13, 1);
+        compressor.start();
     }
 
     public void teleopInit() {
