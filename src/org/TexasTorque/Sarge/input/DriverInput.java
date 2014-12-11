@@ -19,6 +19,6 @@ public class DriverInput extends InputSystem {
         rightSpeed = y - x;
         
         isDropCenter = driver.getRawButton(5);
-        isHighGear = driver.getRawButton(6);
+        isHighGear = !driver.getRawButton(6);
     }
 }
