@@ -1,6 +1,6 @@
 package org.TexasTorque.Sarge.feedback;
 
-public abstract class FeedbackSystem {
+public abstract class FeedbackSystem implements Runnable {
 
     //drivebase
     private double leftPosition;
