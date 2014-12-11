@@ -3,10 +3,10 @@ package org.TexasTorque.Sarge.feedback;
 public abstract class FeedbackSystem implements Runnable {
 
     //drivebase
-    private double leftPosition;
-    private double rightPosition;
-    private double leftVelocity;
-    private double rightVelocity;
+    protected double leftPosition;
+    protected double rightPosition;
+    protected double leftVelocity;
+    protected double rightVelocity;
 
     public double getLeftPosition() {
         return leftPosition;
@@ -25,7 +25,7 @@ public abstract class FeedbackSystem implements Runnable {
     }
 
     //arm
-    private double armAngle;
+    protected double armAngle;
 
     public double getArmAngle() {
         return armAngle;
