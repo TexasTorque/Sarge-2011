@@ -23,5 +23,20 @@ public abstract class InputSystem implements Runnable {
     public synchronized boolean isDropCenter() {
         return isDropCenter;
     }
+    //Arm
+    protected volatile byte armState;
+    protected volatile double targetAngle;
+    protected volatile boolean armOverride;
 
+    public synchronized byte getArmState() {
+        return armState;
+    }
+
+    public synchronized double getTargetAngle() {
+        return targetAngle;
+    }
+
+    public synchronized boolean isArmOverride() {
+        return armOverride;
+    }
 }

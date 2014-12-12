@@ -51,6 +51,9 @@ public class Arm extends Subsystem {
 
     public void update() {
         armAngle = feedback.getArmAngle();
+        targetAngle = input.getTargetAngle();
+        
+        state = input.getArmState();
         
         switch (state) {
             case DOWN:
