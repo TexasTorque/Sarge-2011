@@ -1,6 +1,5 @@
 package org.TexasTorque.Sarge.feedback;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.TexasTorque.Torquelib.component.TorquePotentiometer;
 import org.TexasTorque.Torquelib.component.TorqueQuadrature;
 
@@ -12,6 +11,10 @@ public class SensorFeedback extends FeedbackSystem {
     
     //Arm
     private TorquePotentiometer armPotentiometer;
+    private double horizontalVoltage = 0.0;
+    private double upVoltage = 0.0;
+    private double horizontalAngle = 90.0;
+    private double upAngle = 0.0;
     
     public SensorFeedback()
     {
@@ -19,16 +22,19 @@ public class SensorFeedback extends FeedbackSystem {
         rightDriveEncoder = new TorqueQuadrature(2, 3, true);
         
         armPotentiometer = new TorquePotentiometer(1);
+        armPotentiometer.setRange(horizontalVoltage, upVoltage);
     }
     
     public void run()
     {
-        SmartDashboard.putNumber("armvoltage", armPotentiometer.getRaw());
-        
+        //DriveBase
         leftPosition = leftDriveEncoder.get();
         leftVelocity = leftDriveEncoder.getInstantRate();
         
         rightPosition = rightDriveEncoder.get();
         rightVelocity = rightDriveEncoder.getInstantRate();
+        
+        //ARm
+        armAngle = armPotentiometer.get() * (upAngle - horizontalAngle) + horizontalAngle;
     }
 }
