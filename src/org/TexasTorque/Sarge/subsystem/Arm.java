@@ -24,11 +24,11 @@ public class Arm extends Subsystem {
     private boolean handOpen;
     
     //Angles
-    public final static double FLOOR_ANGLE = 0.0;
-    public final static double LOW_ANGLE = 0.0;
-    public final static double MIDDLE_ANGLE = 0.0;
-    public final static double HIGH_ANGLE = 0.0;
-    public final static double RETRACT_ANGLE = 0.0;
+    public final static double FLOOR_ANGLE = -50.0;
+    public final static double LOW_ANGLE = -45.0;
+    public final static double MIDDLE_ANGLE = 10.0;
+    public final static double HIGH_ANGLE = 60.0;
+    public final static double RETRACT_ANGLE = -60.0;
     
     //States
     public final static byte DOWN = 0;
@@ -48,7 +48,7 @@ public class Arm extends Subsystem {
         armMotor = new Motor(new Jaguar(5), false);
         handMotor = new Motor(new Jaguar(3), false);
 
-        wristSolenoid = new DoubleSolenoid(5, 6);
+        wristSolenoid = new DoubleSolenoid(6, 5);
         handSolenoid = new Solenoid(1);
     }
 
@@ -57,6 +57,8 @@ public class Arm extends Subsystem {
         targetAngle = input.getTargetAngle();
         
         state = input.getArmState();
+        
+        isOverride = input.isArmOverride();
         
         switch (state) {
             case DOWN:
@@ -96,7 +98,7 @@ public class Arm extends Subsystem {
                 wristDown = false;
                 break;
             case PLACE:
-                if (targetAngle > FLOOR_ANGLE && previousState == CARRY) {
+                if (targetAngle > FLOOR_ANGLE || isOverride) {
                     handMotorSpeed = placePower;
 
                     handOpen = true;
@@ -112,7 +114,7 @@ public class Arm extends Subsystem {
             
             handMotor.set(handMotorSpeed);
             
-            if (input.isArmOverride())
+            if (isOverride)
             {
                 armMotor.set(input.getOverrideArmSpeed());
             } else {

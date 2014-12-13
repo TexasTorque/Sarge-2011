@@ -1,5 +1,6 @@
 package org.TexasTorque.Sarge.input;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.TexasTorque.Sarge.subsystem.Arm;
 import org.TexasTorque.Torquelib.component.GenericController;
 import org.TexasTorque.Torquelib.util.TorqueToggle;
@@ -10,7 +11,9 @@ public class DriverInput extends InputSystem {
     private final GenericController operator;
     private final TorqueToggle shifterToggle;
     private final TorqueToggle dropCenterToggle;
+    
     private boolean wasIntaking;
+    private boolean wasOuttaking;
 
     public DriverInput() {
         driver = new GenericController(1, false, 0.2);
@@ -42,30 +45,36 @@ public class DriverInput extends InputSystem {
         } else if (operator.getAButton()) {
             targetAngle = Arm.RETRACT_ANGLE;
         }
-        
+
         if (operator.getRightBumper() && !wasIntaking) {
             targetAngle = Arm.FLOOR_ANGLE;
             armState = Arm.INTAKE;
 
             wasIntaking = true;
         } else if (!operator.getRightBumper() && wasIntaking) {
-            targetAngle = Arm.FLOOR_ANGLE;
             armState = Arm.DOWN;
 
             wasIntaking = false;
         } else if (operator.getBButton()) {
             armState = Arm.CARRY;
-        } else if (operator.getLeftBumper()) {
+        } else if (operator.getLeftBumper() && !wasOuttaking) {
             armState = Arm.OUTTAKE;
+
+            wasOuttaking = true;
+        } else if (!operator.getLeftBumper() && wasOuttaking) {
+            armState = Arm.CARRY;
+            
+            wasOuttaking = false;
         } else if (operator.getRightTrigger()) {
             armState = Arm.PLACE;
         }
         
-        if (operator.getLeftCenterButton())
-        {
+        if (operator.getLeftCenterButton()) {
             armOverride = true;
         } else if (operator.getRightCenterButton()) {
             armOverride = false;
         }
+        
+        overrideArmSpeed = operator.getRightYAxis();
     }
 }
