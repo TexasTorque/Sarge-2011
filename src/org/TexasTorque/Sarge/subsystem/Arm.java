@@ -46,7 +46,7 @@ public class Arm extends Subsystem {
 
     public Arm() {
         armMotor = new Motor(new Jaguar(5), false);
-        handMotor = new Motor(new Jaguar(3), false);
+        handMotor = new Motor(new Jaguar(3), true);
 
         wristSolenoid = new DoubleSolenoid(6, 5);
         handSolenoid = new Solenoid(1);
