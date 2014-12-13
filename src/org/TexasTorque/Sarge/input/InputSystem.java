@@ -27,6 +27,7 @@ public abstract class InputSystem implements Runnable {
     protected volatile byte armState;
     protected volatile double targetAngle;
     protected volatile boolean armOverride;
+    protected volatile double overrideArmSpeed;
 
     public synchronized byte getArmState() {
         return armState;
@@ -38,5 +39,9 @@ public abstract class InputSystem implements Runnable {
 
     public synchronized boolean isArmOverride() {
         return armOverride;
+    }
+
+    public synchronized double getOverrideArmSpeed() {
+        return overrideArmSpeed;
     }
 }

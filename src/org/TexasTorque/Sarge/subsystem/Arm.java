@@ -111,6 +111,13 @@ public class Arm extends Subsystem {
             handSolenoid.set(handOpen);
             
             handMotor.set(handMotorSpeed);
+            
+            if (input.isArmOverride())
+            {
+                armMotor.set(input.getOverrideArmSpeed());
+            } else {
+                //control loop output
+            }
         }
 
         previousTargetAngle = targetAngle;
