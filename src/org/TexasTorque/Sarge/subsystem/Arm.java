@@ -32,7 +32,6 @@ public class Arm extends Subsystem {
     public final static byte OUTTAKE = 2;
     public final static byte CARRY = 3;
     public final static byte PLACE = 4;
-    private int previousState;
     
     //Roller Powers
     private double intakePower = 1.0;
