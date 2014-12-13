@@ -56,7 +56,16 @@ public class Arm extends Subsystem {
         armAngle = feedback.getArmAngle();
         targetAngle = input.getTargetAngle();
         
-        state = input.getArmState();
+        if (input.getArmState() != state)
+        {
+            previousState = state;
+            state = input.getArmState();
+        }
+        
+        if (input.getTargetAngle() != targetAngle) {
+            previousTargetAngle = targetAngle;
+            targetAngle = input.getTargetAngle();
+        }
         
         isOverride = input.isArmOverride();
         
@@ -121,9 +130,6 @@ public class Arm extends Subsystem {
                 //control loop output
             }
         }
-
-        previousTargetAngle = targetAngle;
-        previousState = state;
     }
 
     public void pushToDashboard() {
