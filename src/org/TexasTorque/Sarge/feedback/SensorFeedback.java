@@ -33,11 +33,7 @@ public class SensorFeedback extends FeedbackSystem {
         rightPosition = rightDriveEncoder.get();
         rightVelocity = rightDriveEncoder.getInstantRate();
 
-        //ARm
+        //Arm
         armAngle = armPotentiometer.get() * (upAngle - bottomAngle) + bottomAngle;
-
-        //dashboard
-        SmartDashboard.putNumber("Voltage", armPotentiometer.getRaw());
-        SmartDashboard.putNumber("angle", armAngle);
     }
 }
