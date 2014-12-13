@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.TexasTorque.Sarge.constants.Ports;
 import org.TexasTorque.Torquelib.component.Motor;
 import org.TexasTorque.Torquelib.controlloop.TorquePID;
 
@@ -49,11 +50,11 @@ public class Arm extends Subsystem {
     private TorquePID armPID;
 
     public Arm() {
-        armMotor = new Motor(new Jaguar(5), false);
-        handMotor = new Motor(new Jaguar(3), true);
+        armMotor = new Motor(new Jaguar(Ports.ARM_MOTOR_PORT), false);
+        handMotor = new Motor(new Jaguar(Ports.HAND_MOTOR_PORT), true);
 
-        wristSolenoid = new DoubleSolenoid(6, 5);
-        handSolenoid = new Solenoid(1);
+        wristSolenoid = new DoubleSolenoid(Ports.WRIST_SOLENOID_A, Ports.WRIST_SOLENOID_B);
+        handSolenoid = new Solenoid(Ports.HAND_SOLENOID);
         
         armPID = new TorquePID();
     }
