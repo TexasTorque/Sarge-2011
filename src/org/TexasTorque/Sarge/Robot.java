@@ -5,6 +5,7 @@ import org.TexasTorque.Sarge.feedback.FeedbackSystem;
 import org.TexasTorque.Sarge.feedback.SensorFeedback;
 import org.TexasTorque.Sarge.input.DriverInput;
 import org.TexasTorque.Sarge.input.InputSystem;
+import org.TexasTorque.Sarge.subsystem.Arm;
 import org.TexasTorque.Sarge.subsystem.Drivebase;
 
 public class Robot extends TorqueIterative {
@@ -16,6 +17,7 @@ public class Robot extends TorqueIterative {
     SensorFeedback sensorFeedback;
     
     Drivebase drivebase;
+    Arm arm;
     Compressor compressor;
     
     public void robotInit() {
@@ -24,6 +26,8 @@ public class Robot extends TorqueIterative {
         sensorFeedback = new SensorFeedback();
         
         drivebase = new Drivebase();
+        arm = new Arm();
+        
         compressor = new Compressor(13, 1);
         compressor.start();
     }
@@ -34,16 +38,23 @@ public class Robot extends TorqueIterative {
         feedback = sensorFeedback;
         
         drivebase.setInputSystem(input);
+        drivebase.setFeedbackSystem(feedback);
         drivebase.enableOutput(true);
+        
+        arm.setInputSystem(input);
+        arm.setFeedbackSystem(feedback);
+        arm.enableOutput(true);
     }
 
     public void teleopPeriodic() {
         input.run();
-        
         feedback.run();
         
         drivebase.update();
         drivebase.pushToDashboard();
+        
+        arm.update();
+        arm.pushToDashboard();
     }
     
     
