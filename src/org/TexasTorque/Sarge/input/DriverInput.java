@@ -12,15 +12,15 @@ public class DriverInput extends InputSystem {
     private final TorqueToggle shifterToggle;
     private final TorqueToggle dropCenterToggle;
     
-    private boolean wasIntaking;
-    private boolean wasOuttaking;
-
     public DriverInput() {
         driver = new GenericController(1, false, 0.2);
         operator = new GenericController(2, false, 0.2);
 
         shifterToggle = new TorqueToggle();
         dropCenterToggle = new TorqueToggle();
+        
+        armState = Arm.CARRY;
+        targetAngle = Constants.FLOOR_ANGLE.getDouble();
     }
 
     public void run() {
@@ -40,33 +40,26 @@ public class DriverInput extends InputSystem {
         //Arm
         if (operator.getYButton()) {
             targetAngle = Constants.HIGH_ANGLE.getDouble();
+            armState = Arm.CARRY;
         } else if (operator.getXButton()) {
             targetAngle = Constants.MIDDLE_ANGLE.getDouble();
+            armState = Arm.CARRY;
         } else if (operator.getAButton()) {
             targetAngle = Constants.RETRACT_ANGLE.getDouble();
+            armState = Arm.CARRY;
         }
 
-        if (operator.getRightBumper() && !wasIntaking) {
+        if (operator.getRightBumper()) {
             targetAngle = Constants.FLOOR_ANGLE.getDouble();
             armState = Arm.INTAKE;
-
-            wasIntaking = true;
-        } else if (!operator.getRightBumper() && wasIntaking) {
-            armState = Arm.DOWN;
-
-            wasIntaking = false;
         } else if (operator.getBButton()) {
             armState = Arm.CARRY;
-        } else if (operator.getLeftBumper() && !wasOuttaking) {
+        } else if (operator.getLeftBumper()) {
             armState = Arm.OUTTAKE;
-
-            wasOuttaking = true;
-        } else if (!operator.getLeftBumper() && wasOuttaking) {
-            armState = Arm.CARRY;
-            
-            wasOuttaking = false;
         } else if (operator.getRightTrigger()) {
             armState = Arm.PLACE;
+        } else {
+            armState = Arm.NOTHING;
         }
         
         if (operator.getLeftCenterButton()) {

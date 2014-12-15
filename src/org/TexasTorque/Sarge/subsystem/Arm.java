@@ -25,13 +25,13 @@ public class Arm extends Subsystem {
     private boolean wristDown;
     private boolean handOpen;
     //Angles
-    
     //States
-    public final static byte DOWN = 0;
+    public final static byte NOTHING = 0;
     public final static byte INTAKE = 1;
     public final static byte OUTTAKE = 2;
     public final static byte CARRY = 3;
     public final static byte PLACE = 4;
+    public final static byte DOWN = 5;
     //Roller Powers
     private double intakePower = 1.0;
     private double outtakePower = -1.0;
@@ -56,9 +56,21 @@ public class Arm extends Subsystem {
         armAngle = feedback.getArmAngle();
         targetAngle = input.getTargetAngle();
 
-        if (input.getArmState() != state) {
+        byte newState;
+        if (input.getArmState() == NOTHING) {
+            if (previousState == INTAKE || previousState == OUTTAKE
+               || previousState == DOWN || previousState == PLACE) {
+                newState = DOWN;
+            } else {
+                newState = CARRY;
+            }
+        } else {
+            newState = input.getArmState();
+        }
+
+        if (newState != state) {
             previousState = state;
-            state = input.getArmState();
+            state = newState;
         }
 
         if (input.getTargetAngle() != targetAngle) {
@@ -69,14 +81,6 @@ public class Arm extends Subsystem {
         isOverride = input.isArmOverride();
 
         switch (state) {
-            case DOWN:
-                targetAngle = Constants.FLOOR_ANGLE.getDouble();
-
-                handMotorSpeed = offPower;
-
-                handOpen = false;
-                wristDown = true;
-                break;
             case INTAKE:
                 targetAngle = Constants.FLOOR_ANGLE.getDouble();
 
@@ -112,6 +116,11 @@ public class Arm extends Subsystem {
                     handOpen = true;
                     wristDown = true;
                 }
+                break;
+            case DOWN:
+                handOpen = false;
+                wristDown = true;
+
                 break;
         }
 
