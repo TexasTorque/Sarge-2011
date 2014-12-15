@@ -25,11 +25,7 @@ public class Arm extends Subsystem {
     private boolean wristDown;
     private boolean handOpen;
     //Angles
-    public final static double FLOOR_ANGLE = -50.0;
-    public final static double LOW_ANGLE = -45.0;
-    public final static double MIDDLE_ANGLE = 10.0;
-    public final static double HIGH_ANGLE = 60.0;
-    public final static double RETRACT_ANGLE = -60.0;
+    
     //States
     public final static byte DOWN = 0;
     public final static byte INTAKE = 1;
@@ -74,7 +70,7 @@ public class Arm extends Subsystem {
 
         switch (state) {
             case DOWN:
-                targetAngle = FLOOR_ANGLE;
+                targetAngle = Constants.FLOOR_ANGLE.getDouble();
 
                 handMotorSpeed = offPower;
 
@@ -82,7 +78,7 @@ public class Arm extends Subsystem {
                 wristDown = true;
                 break;
             case INTAKE:
-                targetAngle = FLOOR_ANGLE;
+                targetAngle = Constants.FLOOR_ANGLE.getDouble();
 
                 handMotorSpeed = intakePower;
 
@@ -90,8 +86,8 @@ public class Arm extends Subsystem {
                 wristDown = true;
                 break;
             case OUTTAKE:
-                if (targetAngle == RETRACT_ANGLE) {
-                    targetAngle = FLOOR_ANGLE;
+                if (targetAngle == Constants.RETRACT_ANGLE.getDouble()) {
+                    targetAngle = Constants.FLOOR_ANGLE.getDouble();
                 }
 
                 handMotorSpeed = outtakePower;
@@ -100,8 +96,8 @@ public class Arm extends Subsystem {
                 wristDown = true;
                 break;
             case CARRY:
-                if (targetAngle == FLOOR_ANGLE) {
-                    targetAngle = RETRACT_ANGLE;
+                if (targetAngle == Constants.FLOOR_ANGLE.getDouble()) {
+                    targetAngle = Constants.RETRACT_ANGLE.getDouble();
                 }
 
                 handMotorSpeed = holdPower;
@@ -110,7 +106,7 @@ public class Arm extends Subsystem {
                 wristDown = false;
                 break;
             case PLACE:
-                if (targetAngle > FLOOR_ANGLE || isOverride) {
+                if (targetAngle > Constants.FLOOR_ANGLE.getDouble() || isOverride) {
                     handMotorSpeed = placePower;
 
                     handOpen = true;

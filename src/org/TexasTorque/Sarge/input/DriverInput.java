@@ -1,6 +1,6 @@
 package org.TexasTorque.Sarge.input;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.TexasTorque.Sarge.constants.Constants;
 import org.TexasTorque.Sarge.subsystem.Arm;
 import org.TexasTorque.Torquelib.component.GenericController;
 import org.TexasTorque.Torquelib.util.TorqueToggle;
@@ -39,15 +39,15 @@ public class DriverInput extends InputSystem {
 
         //Arm
         if (operator.getYButton()) {
-            targetAngle = Arm.HIGH_ANGLE;
+            targetAngle = Constants.HIGH_ANGLE.getDouble();
         } else if (operator.getXButton()) {
-            targetAngle = Arm.MIDDLE_ANGLE;
+            targetAngle = Constants.MIDDLE_ANGLE.getDouble();
         } else if (operator.getAButton()) {
-            targetAngle = Arm.RETRACT_ANGLE;
+            targetAngle = Constants.RETRACT_ANGLE.getDouble();
         }
 
         if (operator.getRightBumper() && !wasIntaking) {
-            targetAngle = Arm.FLOOR_ANGLE;
+            targetAngle = Constants.FLOOR_ANGLE.getDouble();
             armState = Arm.INTAKE;
 
             wasIntaking = true;
