@@ -3,6 +3,7 @@ package org.TexasTorque.Sarge;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.communication.FRCControl;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import java.util.TimerTask;
 
 /**
  * @Author TexasTorque
@@ -21,8 +22,8 @@ public abstract class TorqueIterative extends RobotBase {
         Thread periodicThread = new Thread(new Periodic());
         periodicThread.start();
 
-        Thread continousThread = new Thread(new Continuous());
-        continousThread.start();
+        java.util.Timer continuousTimer = new java.util.Timer();
+        continuousTimer.scheduleAtFixedRate(new Continuous(), 0, 10);
 
         System.err.println("UNEXPECTED RETURN FROM startCompetition() IS NORMAL");
     }
@@ -121,7 +122,7 @@ public abstract class TorqueIterative extends RobotBase {
      *
      * It runs at a constant frequency of around 250 Hz at all times.
      */
-    private class Continuous implements Runnable {
+    private class Continuous extends TimerTask {
 
         public void run() {
             while (true) {
