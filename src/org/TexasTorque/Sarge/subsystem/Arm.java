@@ -62,16 +62,7 @@ public class Arm extends Subsystem {
         targetAngle = input.getTargetAngle();
 
         byte newState;
-        if (input.getArmState() == NOTHING) {
-            if (previousState == INTAKE || previousState == OUTTAKE
-                    || previousState == DOWN || previousState == PLACE) {
-                newState = DOWN;
-            } else {
-                newState = CARRY;
-            }
-        } else {
             newState = input.getArmState();
-        }
 
         if (newState != state) {
             previousState = state;
@@ -126,6 +117,9 @@ public class Arm extends Subsystem {
                 handOpen = false;
                 wristDown = true;
 
+                break;
+            case NOTHING:
+                handMotorSpeed = 0.0;
                 break;
         }
 
