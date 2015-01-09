@@ -26,8 +26,13 @@ public abstract class FeedbackSystem implements Runnable {
 
     //arm
     protected double armAngle;
+    protected double armVelocity;
 
     public double getArmAngle() {
         return armAngle;
+    }
+    
+    public double getArmVelocity() {
+        return armVelocity;
     }
 }

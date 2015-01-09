@@ -7,7 +7,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.TexasTorque.Sarge.constants.Constants;
 import org.TexasTorque.Sarge.constants.Ports;
 import org.TexasTorque.Torquelib.component.Motor;
-import org.TexasTorque.Torquelib.controlloop.TorquePID;
+import org.TexasTorque.Torquelib.controlloop.FeedforwardPIV;
+import org.TexasTorque.Torquelib.controlloop.TrapezoidalProfile;
 
 public class Arm extends Subsystem {
 
@@ -39,8 +40,10 @@ public class Arm extends Subsystem {
     private double placePower = -0.25;
     private double offPower = 0.0;
     //PID
-    private TorquePID armPID;
+    FeedforwardPIV armPIV;
+    TrapezoidalProfile profile;
     double kFF;
+    double velocity;
 
     public Arm() {
         armMotor = new Motor(new Jaguar(Ports.ARM_MOTOR_PORT), false);
@@ -49,17 +52,19 @@ public class Arm extends Subsystem {
         wristSolenoid = new DoubleSolenoid(Ports.WRIST_SOLENOID_A, Ports.WRIST_SOLENOID_B);
         handSolenoid = new Solenoid(Ports.HAND_SOLENOID);
 
-        armPID = new TorquePID();
+        armPIV = new FeedforwardPIV();
+        profile = new TrapezoidalProfile(Constants.Arm_maxA.getDouble(), Constants.Arm_maxV.getDouble());
     }
 
     public void update() {
         armAngle = feedback.getArmAngle();
+        velocity = feedback.getArmVelocity();
         targetAngle = input.getTargetAngle();
 
         byte newState;
         if (input.getArmState() == NOTHING) {
             if (previousState == INTAKE || previousState == OUTTAKE
-               || previousState == DOWN || previousState == PLACE) {
+                    || previousState == DOWN || previousState == PLACE) {
                 newState = DOWN;
             } else {
                 newState = CARRY;
@@ -127,10 +132,12 @@ public class Arm extends Subsystem {
         if (isOverride) {
             armMotorSpeed = input.getOverrideArmSpeed();
         } else {
-            double pid = armPID.calculate(armAngle);
-            double feedForward = Math.sin(targetAngle) * kFF;
-            armPID.setSetpoint(targetAngle);
-            armMotorSpeed = pid + feedForward;
+            armPIV.setSetpoint(targetAngle);
+            double error = targetAngle - armAngle;
+            SmartDashboard.putNumber("error", error);
+            profile.update(error, velocity, 0.0, 0.01);
+            SmartDashboard.putNumber("curerntVelocity", profile.getVelocity());
+            armMotorSpeed = armPIV.calculate(profile, armAngle , velocity, 0.01);
         }
 
         if (outputEnabled) {
@@ -150,6 +157,7 @@ public class Arm extends Subsystem {
         SmartDashboard.putNumber("ArmState", state);
         SmartDashboard.putNumber("TargetAngle", targetAngle);
         SmartDashboard.putNumber("Angle", armAngle);
+        SmartDashboard.putNumber("Velocity", velocity);
     }
 
     public void updateGains() {
@@ -158,6 +166,11 @@ public class Arm extends Subsystem {
         double kD = Constants.Arm_Kd.getDouble();
         kFF = Constants.Arm_Kff.getDouble();
 
-        armPID.setPIDGains(kP, kI, kD);
+        double kFFV = Constants.Arm_KffV.getDouble();
+        double kFFA = Constants.Arm_KffA.getDouble();
+        armPIV.setParams(kP, kI, kD, kFFV, kFFA);
+        SmartDashboard.putNumber("kffv", kFFV);
+        
+        profile = new TrapezoidalProfile(Constants.Arm_maxA.getDouble(), Constants.Arm_maxV.getDouble());
     }
 }

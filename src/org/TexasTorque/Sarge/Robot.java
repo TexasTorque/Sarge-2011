@@ -1,6 +1,7 @@
 package org.TexasTorque.Sarge;
 
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.TexasTorque.Sarge.feedback.FeedbackSystem;
 import org.TexasTorque.Sarge.feedback.SensorFeedback;
 import org.TexasTorque.Sarge.input.DriverInput;
@@ -22,6 +23,8 @@ public class Robot extends TorqueIterative {
     Compressor compressor;
     
     Parameters params;
+    
+    int NumCycles = 0;
 
     public void robotInit() {
         params = new Parameters();
@@ -52,20 +55,27 @@ public class Robot extends TorqueIterative {
 
         arm.setInputSystem(input);
         arm.setFeedbackSystem(feedback);
-        arm.enableOutput(false);
+        arm.enableOutput(true);
+        
+        NumCycles = 0;
     }
 
     public void teleopPeriodic() {
         input.run();
-        feedback.run();
 
         drivebase.update();
         drivebase.pushToDashboard();
 
-        arm.update();
         arm.pushToDashboard();
+        
+        SmartDashboard.putNumber("NumCycles", NumCycles++);
     }
 
+    public void teleopContinuous() {
+        feedback.run();
+        arm.update();
+    }
+    
     public void disabledInit() {
         params.load();
         arm.updateGains();

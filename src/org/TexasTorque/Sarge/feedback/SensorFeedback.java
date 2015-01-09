@@ -1,8 +1,9 @@
 package org.TexasTorque.Sarge.feedback;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
 import org.TexasTorque.Torquelib.component.TorquePotentiometer;
 import org.TexasTorque.Torquelib.component.TorqueQuadrature;
+import org.TexasTorque.Torquelib.util.MovingAverageFilter;
 
 public class SensorFeedback extends FeedbackSystem {
 
@@ -15,7 +16,13 @@ public class SensorFeedback extends FeedbackSystem {
     private double bottomVoltage = 2.32;
     private double upVoltage = 0.70;
     private double bottomAngle = -66.0;
-    private double upAngle = 55.0;
+    private int upAngle = 55;
+    
+    private double previousAngle;
+    private double previousTime;
+    
+    MovingAverageFilter positionFilter;
+    MovingAverageFilter velocityFilter;
 
     public SensorFeedback() {
         leftDriveEncoder = new TorqueQuadrature(4, 5, false);
@@ -23,6 +30,9 @@ public class SensorFeedback extends FeedbackSystem {
 
         armPotentiometer = new TorquePotentiometer(1);
         armPotentiometer.setRange(bottomVoltage, upVoltage);
+        
+        positionFilter = new MovingAverageFilter(10);
+        velocityFilter = new MovingAverageFilter(10);
     }
 
     public void run() {
@@ -34,6 +44,20 @@ public class SensorFeedback extends FeedbackSystem {
         rightVelocity = rightDriveEncoder.getInstantRate();
 
         //Arm
-        armAngle = armPotentiometer.get() * (upAngle - bottomAngle) + bottomAngle;
+        double currentAngle = (armPotentiometer.get() * (upAngle - bottomAngle) + bottomAngle);
+        positionFilter.setInput(currentAngle);
+        positionFilter.run();
+        
+        armAngle = positionFilter.getAverage();
+        
+        double currentTime = Timer.getFPGATimestamp();
+        
+        velocityFilter.setInput((armAngle - previousAngle) / (currentTime - previousTime));
+        velocityFilter.run();
+        
+        armVelocity = velocityFilter.getAverage();
+        
+        previousAngle = armAngle;
+        previousTime = currentTime;
     }
 }

@@ -1,5 +1,6 @@
 package org.TexasTorque.Sarge.input;
 
+import edu.wpi.first.wpilibj.Joystick;
 import org.TexasTorque.Sarge.constants.Constants;
 import org.TexasTorque.Sarge.subsystem.Arm;
 import org.TexasTorque.Torquelib.component.GenericController;
@@ -68,6 +69,6 @@ public class DriverInput extends InputSystem {
             armOverride = false;
         }
         
-        overrideArmSpeed = operator.getRightYAxis();
+        overrideArmSpeed = operator.getY(Joystick.Hand.kRight);
     }
 }

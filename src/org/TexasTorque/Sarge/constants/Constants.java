@@ -4,11 +4,16 @@ import org.TexasTorque.Torquelib.util.Parameters.Constant;
 
 public class Constants {
     
-    //Arm PID
+    //Arm PIV
     public static final Constant Arm_Kp = new Constant("R_ArmKp", 0.0);
     public static final Constant Arm_Ki = new Constant("R_ArmKi", 0.0);
     public static final Constant Arm_Kd = new Constant("R_ArmKd", 0.0);
     public static final Constant Arm_Kff = new Constant("R_ArmKff", 0.0);
+    
+    public static final Constant Arm_KffV = new Constant("R_ArmKffV", 0.0);
+    public static final Constant Arm_KffA = new Constant("R_ArmKffA", 0.0);
+    public static final Constant Arm_maxV = new Constant("R_ArmMaxV", 150.0);
+    public static final Constant Arm_maxA = new Constant("R_ArmaxA", 100.0);
     
     //Arm Setpoints
     public final static Constant FLOOR_ANGLE = new Constant("R_FloorAngle", -50.0);
