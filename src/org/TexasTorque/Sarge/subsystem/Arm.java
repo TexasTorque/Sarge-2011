@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.TexasTorque.Sarge.constants.Constants;
 import org.TexasTorque.Sarge.constants.Ports;
 import org.TexasTorque.Torquelib.component.Motor;
-import org.TexasTorque.Torquelib.controlloop.FeedforwardPIV;
-import org.TexasTorque.Torquelib.controlloop.TrapezoidalProfile;
+import org.TexasTorque.Torquelib.controlloop.TorquePID;
+import org.TexasTorque.Torquelib.controlloop.TorqueTMP;
 
 public class Arm extends Subsystem {
 
@@ -40,8 +40,8 @@ public class Arm extends Subsystem {
     private double placePower = -0.25;
     private double offPower = 0.0;
     //PID
-    FeedforwardPIV armPIV;
-    TrapezoidalProfile profile;
+    TorqueTMP profile;
+    TorquePID armPID;
     double kFF;
     double velocity;
 
@@ -52,8 +52,8 @@ public class Arm extends Subsystem {
         wristSolenoid = new DoubleSolenoid(Ports.WRIST_SOLENOID_A, Ports.WRIST_SOLENOID_B);
         handSolenoid = new Solenoid(Ports.HAND_SOLENOID);
 
-        armPIV = new FeedforwardPIV();
-        profile = new TrapezoidalProfile(Constants.Arm_maxA.getDouble(), Constants.Arm_maxV.getDouble());
+        profile = new TorqueTMP(Constants.Arm_maxV.getDouble(), Constants.Arm_maxA.getDouble());
+        armPID = new TorquePID();
     }
 
     public void update() {
@@ -125,13 +125,14 @@ public class Arm extends Subsystem {
 
         if (isOverride) {
             armMotorSpeed = input.getOverrideArmSpeed();
+            
         } else {
-            armPIV.setSetpoint(targetAngle);
-            double error = targetAngle - armAngle;
-            SmartDashboard.putNumber("error", error);
-            profile.update(error, velocity, 0.0, 0.01);
-            SmartDashboard.putNumber("curerntVelocity", profile.getVelocity());
-            armMotorSpeed = armPIV.calculate(profile, armAngle , velocity, 0.01);
+            profile.generateTrapezoid(targetAngle, feedback.getArmAngle(), feedback.getArmVelocity());
+            profile.calculateNextSituation(0.01);
+            
+            armPID.setSetpoint(profile.getCurrentVelocity());
+            
+            armMotorSpeed = armPID.calculate(feedback.getArmVelocity());
         }
 
         if (outputEnabled) {
@@ -159,12 +160,15 @@ public class Arm extends Subsystem {
         double kI = Constants.Arm_Ki.getDouble();
         double kD = Constants.Arm_Kd.getDouble();
         kFF = Constants.Arm_Kff.getDouble();
+        
+        armPID.setPIDGains(kP, kI, kD);
+        armPID.setFeedForward(kD);
 
         double kFFV = Constants.Arm_KffV.getDouble();
         double kFFA = Constants.Arm_KffA.getDouble();
-        armPIV.setParams(kP, kI, kD, kFFV, kFFA);
-        SmartDashboard.putNumber("kffv", kFFV);
         
-        profile = new TrapezoidalProfile(Constants.Arm_maxA.getDouble(), Constants.Arm_maxV.getDouble());
+        armPID.setFeedForward(kFFV);
+        
+        profile = new TorqueTMP(Constants.Arm_maxV.getDouble(), Constants.Arm_maxA.getDouble());
     }
 }
