@@ -4,7 +4,9 @@ package org.TexasTorque.Torquelib.controlloop;
  * Created by Gijs on 12/31/2014.
  */
 public class TorqueTMP {
+
     //Current value
+
     private double currentPosition;
     private double currentVelocity;
     private double currentAcceleration;
@@ -41,7 +43,9 @@ public class TorqueTMP {
     public void generateTrapezoid(double targetPosition, double realPosition, double realSpeed) {
 
         double positionError = targetPosition - realPosition;
-        
+
+        System.out.println(positionError);
+
         if (Math.abs(positionError) < 0.1) {
             return;
         } else if (positionError < 0.0) {
@@ -78,11 +82,11 @@ public class TorqueTMP {
 
         //Calculate the time we will spend accelerating.
         acceleration = maxAllowedAcceleration;
-        accelerationTime = (topSpeed - realSpeed) / acceleration;
+        accelerationTime = Math.max(((topSpeed - realSpeed) / acceleration), 0.0);
         //Vf^2 = V^2 + 2 * a * dX
         //Vf^2 - v^2 = 2 * a * dX
         //dX = (Vf^2 - V^2) / (2 * a)
-        double accelerationDistance = (topSpeed * topSpeed - realSpeed * realSpeed) / (2 * acceleration);
+        double accelerationDistance = Math.max(((topSpeed * topSpeed - realSpeed * realSpeed) / (2 * acceleration)), 0.0);
 
         deceleration = -1 * acceleration;
         decelerationTime = (0 - topSpeed) / deceleration;
@@ -107,18 +111,19 @@ public class TorqueTMP {
     }
 
     /**
-     * Calculate what our position, velocity, and acceleration should be in the future.
-     * 
-     * 
-     * @param dt 
+     * Calculate what our position, velocity, and acceleration should be in the
+     * future.
+     *
+     *
+     * @param dt
      */
     public void calculateNextSituation(double dt) {
         if (dt < accelerationTime) {
             accelerate(dt);
-        } else if (dt < accelerationTime + cruiseTime) {
+        } else if (dt < (accelerationTime + cruiseTime)) {
             accelerate(accelerationTime);
             cruise(dt - accelerationTime);
-        } else if (dt < accelerationTime + cruiseTime + decelerationTime) {
+        } else if (dt < (accelerationTime + cruiseTime + decelerationTime)) {
             accelerate(accelerationTime);
             cruise(cruiseTime);
             decelerate(dt - accelerationTime - cruiseTime);
@@ -132,7 +137,7 @@ public class TorqueTMP {
 
     /**
      * Accelerate at maximum acceleration for the specified amount of time.
-     * 
+     *
      * @param dt The time to accelerate for.
      */
     private void accelerate(double dt) {
@@ -143,7 +148,7 @@ public class TorqueTMP {
 
     /**
      * Cruise for the specified amount of time.
-     * 
+     *
      * @param dt The time to cruise for.
      */
     private void cruise(double dt) {
@@ -154,7 +159,7 @@ public class TorqueTMP {
 
     /**
      * Decelerate at -1 * maximum acceleration for the specified amount of time.
-     * 
+     *
      * @param dt The time to decelerate for.
      */
     private void decelerate(double dt) {
@@ -163,7 +168,7 @@ public class TorqueTMP {
         currentVelocity += deceleration * dt;
     }
 
-    public String toString(){
+    public String toString() {
         System.out.println("P: " + getCurrentPosition());
         System.out.println("V: " + getCurrentVelocity());
         System.out.println("A: " + getCurrentAcceleration());
