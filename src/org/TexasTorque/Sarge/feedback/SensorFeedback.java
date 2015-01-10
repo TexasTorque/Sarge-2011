@@ -1,6 +1,8 @@
 package org.TexasTorque.Sarge.feedback;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.TexasTorque.Sarge.constants.Constants;
 import org.TexasTorque.Torquelib.component.TorquePotentiometer;
 import org.TexasTorque.Torquelib.component.TorqueQuadrature;
 import org.TexasTorque.Torquelib.util.MovingAverageFilter;
@@ -13,8 +15,8 @@ public class SensorFeedback extends FeedbackSystem {
 
     //Arm
     private TorquePotentiometer armPotentiometer;
-    private double bottomVoltage = 2.32;
-    private double upVoltage = 0.70;
+    private double bottomVoltage;
+    private double upVoltage;
     private double bottomAngle = -66.0;
     private int upAngle = 55;
     
@@ -25,6 +27,9 @@ public class SensorFeedback extends FeedbackSystem {
     MovingAverageFilter velocityFilter;
 
     public SensorFeedback() {
+        bottomVoltage = Constants.Arm_BottomVoltage.getDouble();
+        upVoltage = Constants.Arm_TopVoltage.getDouble();
+        
         leftDriveEncoder = new TorqueQuadrature(4, 5, false);
         rightDriveEncoder = new TorqueQuadrature(2, 3, true);
 
@@ -44,6 +49,7 @@ public class SensorFeedback extends FeedbackSystem {
         rightVelocity = rightDriveEncoder.getInstantRate();
 
         //Arm
+        SmartDashboard.putNumber("ArmVoltage", armPotentiometer.getRaw());
         double currentAngle = (armPotentiometer.get() * (upAngle - bottomAngle) + bottomAngle);
         positionFilter.setInput(currentAngle);
         positionFilter.run();
@@ -59,5 +65,12 @@ public class SensorFeedback extends FeedbackSystem {
         
         previousAngle = armAngle;
         previousTime = currentTime;
+    }
+
+    public void loadParams() {
+        bottomVoltage = Constants.Arm_BottomVoltage.getDouble();
+        upVoltage = Constants.Arm_TopVoltage.getDouble();
+        
+        armPotentiometer.setRange(bottomVoltage, upVoltage);
     }
 }

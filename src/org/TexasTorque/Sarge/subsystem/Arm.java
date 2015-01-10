@@ -57,9 +57,9 @@ public class Arm extends Subsystem {
     }
 
     public void update() {
-        armAngle = feedback.getArmAngle() + 60.0;
+        armAngle = feedback.getArmAngle() + 100;
         velocity = feedback.getArmVelocity();
-        targetAngle = input.getTargetAngle() + 60.0;
+        targetAngle = input.getTargetAngle() + 100;
 
         byte newState;
             newState = input.getArmState();
@@ -71,14 +71,14 @@ public class Arm extends Subsystem {
 
         if (input.getTargetAngle() != targetAngle) {
             previousTargetAngle = targetAngle;
-            targetAngle = input.getTargetAngle();
+            targetAngle = input.getTargetAngle() + 100;
         }
 
         isOverride = input.isArmOverride();
 
         switch (state) {
             case INTAKE:
-                targetAngle = Constants.FLOOR_ANGLE.getDouble();
+                targetAngle = Constants.FLOOR_ANGLE.getDouble() + 100;
 
                 handMotorSpeed = intakePower;
 
@@ -87,7 +87,7 @@ public class Arm extends Subsystem {
                 break;
             case OUTTAKE:
                 if (targetAngle == Constants.RETRACT_ANGLE.getDouble()) {
-                    targetAngle = Constants.FLOOR_ANGLE.getDouble();
+                    targetAngle = Constants.FLOOR_ANGLE.getDouble() + 100;
                 }
 
                 handMotorSpeed = outtakePower;
@@ -97,7 +97,7 @@ public class Arm extends Subsystem {
                 break;
             case CARRY:
                 if (targetAngle == Constants.FLOOR_ANGLE.getDouble()) {
-                    targetAngle = Constants.RETRACT_ANGLE.getDouble();
+                    targetAngle = Constants.RETRACT_ANGLE.getDouble() + 100;
                 }
 
                 handMotorSpeed = holdPower;
@@ -127,8 +127,10 @@ public class Arm extends Subsystem {
             armMotorSpeed = input.getOverrideArmSpeed();
             
         } else {
-            profile.generateTrapezoid(targetAngle, feedback.getArmAngle(), feedback.getArmVelocity());
+            profile.generateTrapezoid(targetAngle, feedback.getArmAngle() + 100, feedback.getArmVelocity());
             profile.calculateNextSituation(0.01);
+            
+            SmartDashboard.putNumber("targetVelocity", profile.getCurrentVelocity());
             
             armPID.setSetpoint(profile.getCurrentVelocity());
             

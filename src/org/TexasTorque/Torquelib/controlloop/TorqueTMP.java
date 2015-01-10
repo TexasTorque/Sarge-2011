@@ -39,12 +39,10 @@ public class TorqueTMP {
     public double getCurrentAcceleration() {
         return currentAcceleration;
     }
-
+    
     public void generateTrapezoid(double targetPosition, double realPosition, double realSpeed) {
 
         double positionError = targetPosition - realPosition;
-
-        System.out.println(positionError);
 
         if (Math.abs(positionError) < 0.1) {
             return;
@@ -52,8 +50,6 @@ public class TorqueTMP {
             generateTrapezoid(-targetPosition, -realPosition, -realSpeed);
             acceleration *= -1;
             deceleration *= -1;
-            topSpeed *= -1;
-            currentVelocity *= -1;
             return;
         }
 
@@ -103,7 +99,7 @@ public class TorqueTMP {
 
         //Our target velocity right now is our current velocity because thats what
         //the profile was based on.
-        currentVelocity = realSpeed;
+        //currentVelocity = Math.max(realSpeed, 0.0);
 
         //Our target position right now is our current position because thats what
         //the profile was based on.
@@ -117,22 +113,46 @@ public class TorqueTMP {
      *
      * @param dt
      */
+//    public void calculateNextSituation(double dt) {
+//        if (dt < accelerationTime) {
+//            accelerate(dt);
+//        } else if (dt < (accelerationTime + cruiseTime)) {
+//            accelerate(accelerationTime);
+//            cruise(dt - accelerationTime);
+//        } else if (dt < (accelerationTime + cruiseTime + decelerationTime)) {
+//            accelerate(accelerationTime);
+//            cruise(cruiseTime);
+//            decelerate(dt - accelerationTime - cruiseTime);
+//        } else {
+//            accelerate(accelerationTime);
+//            cruise(cruiseTime);
+//            decelerate(decelerationTime);
+//            currentAcceleration = 0.0;
+//        }
+//    }
+    
     public void calculateNextSituation(double dt) {
         if (dt < accelerationTime) {
-            accelerate(dt);
+            updateKinematics(acceleration, dt);
         } else if (dt < (accelerationTime + cruiseTime)) {
-            accelerate(accelerationTime);
-            cruise(dt - accelerationTime);
+            updateKinematics(acceleration, accelerationTime);
+            updateKinematics(0.0, dt - accelerationTime);
         } else if (dt < (accelerationTime + cruiseTime + decelerationTime)) {
-            accelerate(accelerationTime);
-            cruise(cruiseTime);
-            decelerate(dt - accelerationTime - cruiseTime);
+            updateKinematics(acceleration, accelerationTime);
+            updateKinematics(0.0, cruiseTime);
+            updateKinematics(deceleration, dt - accelerationTime - cruiseTime);
         } else {
-            accelerate(accelerationTime);
-            cruise(cruiseTime);
-            decelerate(decelerationTime);
+            updateKinematics(acceleration, dt);
+            updateKinematics(0.0, accelerationTime);
+            updateKinematics(deceleration, decelerationTime);
             currentAcceleration = 0.0;
         }
+    }
+    
+    private void updateKinematics(double accel, double dt) {
+        currentAcceleration = accel;
+        currentPosition += currentVelocity * dt + 0.5 * currentAcceleration * dt * dt;
+        currentVelocity += currentAcceleration * dt;
     }
 
     /**
