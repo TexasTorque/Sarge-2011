@@ -57,9 +57,9 @@ public class Arm extends Subsystem {
     }
 
     public void update() {
-        armAngle = feedback.getArmAngle();
+        armAngle = feedback.getArmAngle() + 60.0;
         velocity = feedback.getArmVelocity();
-        targetAngle = input.getTargetAngle();
+        targetAngle = input.getTargetAngle() + 60.0;
 
         byte newState;
             newState = input.getArmState();
