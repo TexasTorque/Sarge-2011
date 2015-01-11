@@ -97,10 +97,6 @@ public class TorqueTMP {
         //Cruise time is cruising distance divided by the speed at which we cruise.
         cruiseTime = cruiseDistance / topSpeed;
 
-        //Our target velocity right now is our current velocity because thats what
-        //the profile was based on.
-        //currentVelocity = Math.max(realSpeed, 0.0);
-
         //Our target position right now is our current position because thats what
         //the profile was based on.
         currentPosition = realPosition;
@@ -110,49 +106,24 @@ public class TorqueTMP {
      * Calculate what our position, velocity, and acceleration should be in the
      * future.
      *
-     *
      * @param dt
      */
-//    public void calculateNextSituation(double dt) {
-//        if (dt < accelerationTime) {
-//            accelerate(dt);
-//        } else if (dt < (accelerationTime + cruiseTime)) {
-//            accelerate(accelerationTime);
-//            cruise(dt - accelerationTime);
-//        } else if (dt < (accelerationTime + cruiseTime + decelerationTime)) {
-//            accelerate(accelerationTime);
-//            cruise(cruiseTime);
-//            decelerate(dt - accelerationTime - cruiseTime);
-//        } else {
-//            accelerate(accelerationTime);
-//            cruise(cruiseTime);
-//            decelerate(decelerationTime);
-//            currentAcceleration = 0.0;
-//        }
-//    }
-    
     public void calculateNextSituation(double dt) {
         if (dt < accelerationTime) {
-            updateKinematics(acceleration, dt);
+            accelerate(dt);
         } else if (dt < (accelerationTime + cruiseTime)) {
-            updateKinematics(acceleration, accelerationTime);
-            updateKinematics(0.0, dt - accelerationTime);
+            accelerate(accelerationTime);
+            cruise(dt - accelerationTime);
         } else if (dt < (accelerationTime + cruiseTime + decelerationTime)) {
-            updateKinematics(acceleration, accelerationTime);
-            updateKinematics(0.0, cruiseTime);
-            updateKinematics(deceleration, dt - accelerationTime - cruiseTime);
+            accelerate(accelerationTime);
+            cruise(cruiseTime);
+            decelerate(dt - accelerationTime - cruiseTime);
         } else {
-            updateKinematics(acceleration, dt);
-            updateKinematics(0.0, accelerationTime);
-            updateKinematics(deceleration, decelerationTime);
+            accelerate(accelerationTime);
+            cruise(cruiseTime);
+            decelerate(decelerationTime);
             currentAcceleration = 0.0;
         }
-    }
-    
-    private void updateKinematics(double accel, double dt) {
-        currentAcceleration = accel;
-        currentPosition += currentVelocity * dt + 0.5 * currentAcceleration * dt * dt;
-        currentVelocity += currentAcceleration * dt;
     }
 
     /**
@@ -163,7 +134,7 @@ public class TorqueTMP {
     private void accelerate(double dt) {
         currentAcceleration = acceleration;
         currentPosition += currentVelocity * dt + 0.5 * currentAcceleration * dt * dt;
-        currentVelocity += acceleration * dt;
+        currentVelocity += currentAcceleration * dt;
     }
 
     /**
@@ -173,8 +144,8 @@ public class TorqueTMP {
      */
     private void cruise(double dt) {
         currentAcceleration = 0.0;
-        currentPosition += topSpeed * dt;
-        currentVelocity = topSpeed;
+        currentPosition += currentVelocity * dt + 0.5 * currentAcceleration * dt * dt;
+        currentVelocity += currentAcceleration * dt;
     }
 
     /**
@@ -185,7 +156,7 @@ public class TorqueTMP {
     private void decelerate(double dt) {
         currentAcceleration = deceleration;
         currentPosition += currentVelocity * dt + 0.5 * deceleration * dt * dt;
-        currentVelocity += deceleration * dt;
+        currentVelocity += currentAcceleration * dt;
     }
 
     public String toString() {
