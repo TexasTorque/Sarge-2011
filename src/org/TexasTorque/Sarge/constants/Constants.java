@@ -3,9 +3,9 @@ package org.TexasTorque.Sarge.constants;
 import org.TexasTorque.Torquelib.util.Parameters.Constant;
 
 public class Constants {
-    //Arm voltages
-    public static final Constant Arm_BottomVoltage = new Constant("R_BottomVoltage", 0.0);
-    public static final Constant Arm_TopVoltage = new Constant("R_TopVoltage", 0.0);
+    //Arm encoder
+    public static final Constant Arm_DegreesPerClick = new Constant("R_DegreesPerclick", 0.0);
+    public static final Constant Arm_BottomAngle = new Constant("R_BottomAngle", 0.0);
     
     //Arm PIV
     public static final Constant Arm_Kp = new Constant("R_ArmKp", 0.0);
