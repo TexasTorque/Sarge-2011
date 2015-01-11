@@ -12,7 +12,6 @@ public abstract class Subsystem {
     protected volatile boolean isOverride;
     
     protected volatile byte state;
-    protected volatile byte previousState;
 
     public void enableOutput(boolean enable) {
         outputEnabled = enable;
