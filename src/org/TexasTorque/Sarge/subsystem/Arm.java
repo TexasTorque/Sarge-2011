@@ -44,6 +44,7 @@ public class Arm extends Subsystem {
     TorquePID armPID;
     double kFF;
     double velocity;
+    double positionFF;
 
     public Arm() {
         armMotor = new Motor(new Jaguar(Ports.ARM_MOTOR_PORT), false);
@@ -62,7 +63,7 @@ public class Arm extends Subsystem {
         targetAngle = input.getTargetAngle() + 100;
 
         byte newState;
-            newState = input.getArmState();
+        newState = input.getArmState();
 
         if (newState != state) {
             previousState = state;
@@ -125,16 +126,18 @@ public class Arm extends Subsystem {
 
         if (isOverride) {
             armMotorSpeed = input.getOverrideArmSpeed();
-            
+
         } else {
             profile.generateTrapezoid(targetAngle, feedback.getArmAngle() + 100, feedback.getArmVelocity());
             profile.calculateNextSituation(0.01);
-            
+
             SmartDashboard.putNumber("targetVelocity", profile.getCurrentVelocity());
-            
+
             armPID.setSetpoint(profile.getCurrentVelocity());
-            
-            armMotorSpeed = armPID.calculate(feedback.getArmVelocity());
+
+            double feedForward = positionFF * Math.cos(targetAngle);
+
+            armMotorSpeed = feedForward + armPID.calculate(feedback.getArmVelocity());
         }
 
         if (outputEnabled) {
@@ -162,15 +165,17 @@ public class Arm extends Subsystem {
         double kI = Constants.Arm_Ki.getDouble();
         double kD = Constants.Arm_Kd.getDouble();
         kFF = Constants.Arm_Kff.getDouble();
-        
+
         armPID.setPIDGains(kP, kI, kD);
         armPID.setFeedForward(kD);
 
         double kFFV = Constants.Arm_KffV.getDouble();
         double kFFA = Constants.Arm_KffA.getDouble();
-        
+
         armPID.setFeedForward(kFFV);
-        
+
         profile = new TorqueTMP(Constants.Arm_maxV.getDouble(), Constants.Arm_maxA.getDouble());
+
+        positionFF = Constants.Arm_positionFF.getDouble();
     }
 }

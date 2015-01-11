@@ -18,6 +18,8 @@ public class Constants {
     public static final Constant Arm_maxV = new Constant("R_ArmMaxV", 150.0);
     public static final Constant Arm_maxA = new Constant("R_ArmaxA", 100.0);
     
+    public static final Constant Arm_positionFF = new Constant("R_PositionFF", 0.0);
+    
     //Arm Setpoints
     public final static Constant FLOOR_ANGLE = new Constant("R_FloorAngle", -50.0);
     public final static Constant LOW_ANGLE = new Constant("R_LowAngle", -45.0);
