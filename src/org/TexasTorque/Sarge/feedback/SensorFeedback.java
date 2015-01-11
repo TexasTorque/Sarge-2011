@@ -1,11 +1,9 @@
 package org.TexasTorque.Sarge.feedback;
 
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.CounterBase;
 import org.TexasTorque.Sarge.constants.Constants;
-import org.TexasTorque.Torquelib.component.TorquePotentiometer;
+import org.TexasTorque.Sarge.constants.Ports;
 import org.TexasTorque.Torquelib.component.TorqueQuadrature;
-import org.TexasTorque.Torquelib.util.MovingAverageFilter;
 
 public class SensorFeedback extends FeedbackSystem {
 
@@ -14,30 +12,18 @@ public class SensorFeedback extends FeedbackSystem {
     private TorqueQuadrature rightDriveEncoder;
 
     //Arm
-    private TorquePotentiometer armPotentiometer;
-    private double bottomVoltage;
-    private double upVoltage;
-    private double bottomAngle = -66.0;
-    private int upAngle = 55;
+    private TorqueQuadrature armEncoder;
+    private double bottomAngle;
+    private double degreesPerClick;
     
-    private double previousAngle;
-    private double previousTime;
-    
-    MovingAverageFilter positionFilter;
-    MovingAverageFilter velocityFilter;
-
     public SensorFeedback() {
-        bottomVoltage = Constants.Arm_BottomVoltage.getDouble();
-        upVoltage = Constants.Arm_TopVoltage.getDouble();
-        
         leftDriveEncoder = new TorqueQuadrature(4, 5, false);
         rightDriveEncoder = new TorqueQuadrature(2, 3, true);
-
-        armPotentiometer = new TorquePotentiometer(1);
-        armPotentiometer.setRange(bottomVoltage, upVoltage);
         
-        positionFilter = new MovingAverageFilter(10);
-        velocityFilter = new MovingAverageFilter(10);
+        bottomAngle = Constants.Arm_BottomAngle.getDouble();
+        degreesPerClick = Constants.Arm_DegreesPerClick.getDouble();
+        
+        armEncoder = new TorqueQuadrature(Ports.ARM_ENCODER_A, Ports.ARM_ENCODER_B, false, CounterBase.EncodingType.k4X);
     }
 
     public void run() {
@@ -49,28 +35,14 @@ public class SensorFeedback extends FeedbackSystem {
         rightVelocity = rightDriveEncoder.getInstantRate();
 
         //Arm
-        SmartDashboard.putNumber("ArmVoltage", armPotentiometer.getRaw());
-        double currentAngle = (armPotentiometer.get() * (upAngle - bottomAngle) + bottomAngle);
-        positionFilter.setInput(currentAngle);
-        positionFilter.run();
+        armEncoder.calc();
         
-        armAngle = positionFilter.getAverage();
-        
-        double currentTime = Timer.getFPGATimestamp();
-        
-        velocityFilter.setInput((armAngle - previousAngle) / (currentTime - previousTime));
-        velocityFilter.run();
-        
-        armVelocity = velocityFilter.getAverage();
-        
-        previousAngle = armAngle;
-        previousTime = currentTime;
+        armAngle = armEncoder.get() * degreesPerClick + bottomAngle;
+        armVelocity = armEncoder.getSecantRate();
     }
 
     public void loadParams() {
-        bottomVoltage = Constants.Arm_BottomVoltage.getDouble();
-        upVoltage = Constants.Arm_TopVoltage.getDouble();
-        
-        armPotentiometer.setRange(bottomVoltage, upVoltage);
+        bottomAngle = Constants.Arm_BottomAngle.getDouble();
+        degreesPerClick = Constants.Arm_DegreesPerClick.getDouble();
     }
 }
