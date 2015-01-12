@@ -17,9 +17,6 @@ public class Ports {
     public final static int WRIST_SOLENOID_B = 5;
     public final static int HAND_SOLENOID = 1;
     
-    public final static int ARM_ENCODER_A = 6;
-    public final static int ARM_ENCODER_B = 7;
-    
     //Pneumatics
     public static final int SPIKE_RELAY = 1;
     public static final int PRESSURE_SWITCH = 13;
