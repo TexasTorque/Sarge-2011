@@ -1,48 +1,49 @@
 package org.TexasTorque.Sarge.feedback;
 
 import edu.wpi.first.wpilibj.CounterBase;
-import org.TexasTorque.Sarge.constants.Constants;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.TexasTorque.Sarge.constants.Ports;
-import org.TexasTorque.Torquelib.component.TorqueQuadrature;
+import org.TexasTorque.Torquelib.component.TorqueEncoder;
 
 public class SensorFeedback extends FeedbackSystem {
 
     //Drivebase
-    private TorqueQuadrature leftDriveEncoder;
-    private TorqueQuadrature rightDriveEncoder;
+    private TorqueEncoder leftDriveEncoder;
+    private TorqueEncoder rightDriveEncoder;
 
     //Arm
-    private TorqueQuadrature armEncoder;
-    private double bottomAngle;
-    private double degreesPerClick;
+    private TorqueEncoder armEncoder;
+    private double bottomAngle = -66;
+    private double degreesPerClick = 1.44;
     
     public SensorFeedback() {
-        leftDriveEncoder = new TorqueQuadrature(4, 5, false);
-        rightDriveEncoder = new TorqueQuadrature(2, 3, true);
+        leftDriveEncoder = new TorqueEncoder(4, 5, false, CounterBase.EncodingType.k2X);
+        leftDriveEncoder.start();
+        rightDriveEncoder = new TorqueEncoder(2, 3, true, CounterBase.EncodingType.k2X);
+        rightDriveEncoder.start();
         
-        bottomAngle = Constants.Arm_BottomAngle.getDouble();
-        degreesPerClick = Constants.Arm_DegreesPerClick.getDouble();
-        
-        armEncoder = new TorqueQuadrature(Ports.ARM_ENCODER_A, Ports.ARM_ENCODER_B, false, CounterBase.EncodingType.k4X);
+        armEncoder = new TorqueEncoder(Ports.ARM_ENCODER_A, Ports.ARM_ENCODER_B, false, CounterBase.EncodingType.k2X);
+        armEncoder.start();
     }
 
     public void run() {
         //DriveBase
+        leftDriveEncoder.calc();
         leftPosition = leftDriveEncoder.get();
-        leftVelocity = leftDriveEncoder.getInstantRate();
+        leftVelocity = leftDriveEncoder.getRate();
 
+        rightDriveEncoder.calc();
         rightPosition = rightDriveEncoder.get();
-        rightVelocity = rightDriveEncoder.getInstantRate();
+        rightVelocity = rightDriveEncoder.getRate();
 
         //Arm
         armEncoder.calc();
         
-        armAngle = armEncoder.get() * degreesPerClick + bottomAngle;
-        armVelocity = armEncoder.getSecantRate();
+        armAngle = armEncoder.getDistance() * degreesPerClick + bottomAngle;
+        armVelocity = armEncoder.getRate();
     }
 
     public void loadParams() {
-        bottomAngle = Constants.Arm_BottomAngle.getDouble();
-        degreesPerClick = Constants.Arm_DegreesPerClick.getDouble();
     }
 }

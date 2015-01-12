@@ -48,7 +48,6 @@ public class Robot extends TorqueIterative {
         input = driverInput;
 
         feedback = sensorFeedback;
-        feedback.loadParams();
 
         drivebase.setInputSystem(input);
         drivebase.setFeedbackSystem(feedback);

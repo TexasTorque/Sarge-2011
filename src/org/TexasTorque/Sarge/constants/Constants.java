@@ -3,10 +3,6 @@ package org.TexasTorque.Sarge.constants;
 import org.TexasTorque.Torquelib.util.Parameters.Constant;
 
 public class Constants {
-    //Arm encoder
-    public static final Constant Arm_DegreesPerClick = new Constant("R_DegreesPerclick", 0.0);
-    public static final Constant Arm_BottomAngle = new Constant("R_BottomAngle", 0.0);
-    
     //Arm PIV
     public static final Constant Arm_Kp = new Constant("R_ArmKp", 0.0);
     public static final Constant Arm_Ki = new Constant("R_ArmKi", 0.0);
@@ -16,7 +12,7 @@ public class Constants {
     public static final Constant Arm_KffV = new Constant("R_ArmKffV", 0.0);
     public static final Constant Arm_KffA = new Constant("R_ArmKffA", 0.0);
     public static final Constant Arm_maxV = new Constant("R_ArmMaxV", 150.0);
-    public static final Constant Arm_maxA = new Constant("R_ArmaxA", 100.0);
+    public static final Constant Arm_maxA = new Constant("R_ArmMaxA", 100.0);
     
     public static final Constant Arm_positionFF = new Constant("R_PositionFF", 0.0);
     
