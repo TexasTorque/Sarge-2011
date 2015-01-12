@@ -59,16 +59,16 @@ public class Arm extends Subsystem {
     }
 
     public void update() {
-        armAngle = feedback.getArmAngle() + 100;
+        armAngle = feedback.getArmAngle();
         armVelocity = feedback.getArmVelocity();
-        targetAngle = input.getTargetAngle() + 100;
+        targetAngle = input.getTargetAngle();
         isOverride = input.isArmOverride();
 
         state = input.getArmState();
 
         switch (state) {
             case INTAKE:
-                targetAngle = Constants.FLOOR_ANGLE.getDouble() + 100;
+                targetAngle = Constants.FLOOR_ANGLE.getDouble();
 
                 handMotorSpeed = intakePower;
 
@@ -77,7 +77,7 @@ public class Arm extends Subsystem {
                 break;
             case OUTTAKE:
                 if (targetAngle == Constants.RETRACT_ANGLE.getDouble()) {
-                    targetAngle = Constants.FLOOR_ANGLE.getDouble() + 100;
+                    targetAngle = Constants.FLOOR_ANGLE.getDouble();
                 }
 
                 handMotorSpeed = outtakePower;
@@ -87,7 +87,7 @@ public class Arm extends Subsystem {
                 break;
             case CARRY:
                 if (targetAngle == Constants.FLOOR_ANGLE.getDouble()) {
-                    targetAngle = Constants.RETRACT_ANGLE.getDouble() + 100;
+                    targetAngle = Constants.RETRACT_ANGLE.getDouble();
                 }
 
                 handMotorSpeed = holdPower;
@@ -118,7 +118,7 @@ public class Arm extends Subsystem {
             armMotorSpeed = input.getOverrideArmSpeed();
         } else {
             //Generate a new profile and figure out where we should be next.
-            profile.generateTrapezoid(targetAngle, feedback.getArmAngle() + 100, feedback.getArmVelocity());
+            profile.generateTrapezoid(targetAngle, feedback.getArmAngle(), feedback.getArmVelocity());
             profile.calculateNextSituation(0.01);
             //Set the next veloctity as our target for the Velocity PID controller.
             armPID.setSetpoint(profile.getCurrentVelocity());
