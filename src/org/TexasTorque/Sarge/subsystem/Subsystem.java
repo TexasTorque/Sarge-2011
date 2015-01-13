@@ -25,7 +25,7 @@ public abstract class Subsystem {
         feedback = feed;
     }
 
-    public abstract void update();
+    public synchronized void update() {}
 
     public abstract void pushToDashboard();
 

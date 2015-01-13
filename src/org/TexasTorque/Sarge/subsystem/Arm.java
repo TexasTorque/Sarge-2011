@@ -68,7 +68,7 @@ public class Arm extends Subsystem {
         updateGains();
     }
 
-    public void update() {
+    public synchronized void update() {
         armAngle = feedback.getArmAngle();
         armVelocity = feedback.getArmVelocity();
         targetAngle = input.getTargetAngle();

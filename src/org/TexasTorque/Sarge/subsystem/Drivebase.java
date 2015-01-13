@@ -31,7 +31,7 @@ public class Drivebase extends Subsystem {
         dropdriveSolenoid = new Solenoid(Ports.DROPDRIVE_PORT);
     }
 
-    public void update() {
+    public synchronized void update() {
         leftSpeed = input.getLeftSpeed();
         rightSpeed = input.getRightSpeed();
         highGear = input.isHighGear();

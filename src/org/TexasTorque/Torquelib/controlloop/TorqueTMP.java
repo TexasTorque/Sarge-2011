@@ -6,7 +6,6 @@ package org.TexasTorque.Torquelib.controlloop;
 public class TorqueTMP {
 
     //Current value
-
     private double currentPosition;
     private double currentVelocity;
     private double currentAcceleration;
@@ -39,7 +38,7 @@ public class TorqueTMP {
     public double getCurrentAcceleration() {
         return currentAcceleration;
     }
-    
+
     public void generateTrapezoid(double distance, double realSpeed) {
 
         if (Math.abs(distance) < 0.1) {
@@ -93,7 +92,11 @@ public class TorqueTMP {
         //Cruising distance is the distance we do not spend accelerating or decelerating.
         double cruiseDistance = distance - accelerationDistance - decelerationDistance;
         //Cruise time is cruising distance divided by the speed at which we cruise.
-        cruiseTime = cruiseDistance / topSpeed;
+        if (topSpeed != 0) {
+            cruiseTime = cruiseDistance / topSpeed;
+        } else {
+            cruiseTime = 0.0;
+        }
     }
 
     /**
@@ -129,7 +132,7 @@ public class TorqueTMP {
         currentAcceleration = acceleration;
         currentPosition += currentVelocity * dt + 0.5 * currentAcceleration * dt * dt;
         currentVelocity += currentAcceleration * dt;
-        
+
         if (currentVelocity > topSpeed) {
             currentVelocity = topSpeed;
         } else if (currentVelocity < -topSpeed) {
@@ -157,7 +160,7 @@ public class TorqueTMP {
         currentAcceleration = deceleration;
         currentPosition += currentVelocity * dt + 0.5 * deceleration * dt * dt;
         currentVelocity += currentAcceleration * dt;
-        
+
         if (currentVelocity > topSpeed) {
             currentVelocity = topSpeed;
         } else if (currentVelocity < -topSpeed) {
