@@ -70,5 +70,9 @@ public class DriverInput extends InputSystem {
         }
         
         overrideArmSpeed = operator.getY(Joystick.Hand.kRight);
+        
+        if (operator.getLeftStickClick()) {
+            feedback.resetArmAngle();
+        }
     }
 }

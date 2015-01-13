@@ -11,7 +11,7 @@ public class Ports {
     public static final int DROPDRIVE_PORT = 2;
     
     //Arm
-    public static final int ARM_MOTOR_PORT = 5;
+    public static final int ARM_MOTOR_PORT = 7;
     public final static int HAND_MOTOR_PORT = 3;
     public final static int WRIST_SOLENOID_A = 6;
     public final static int WRIST_SOLENOID_B = 5;

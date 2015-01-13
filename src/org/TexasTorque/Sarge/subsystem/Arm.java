@@ -3,6 +3,7 @@ package org.TexasTorque.Sarge.subsystem;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.TexasTorque.Sarge.constants.Constants;
 import org.TexasTorque.Sarge.constants.Ports;
@@ -38,7 +39,7 @@ public class Arm extends Subsystem {
     private double holdPower = 0.1;
     private double placePower = -0.25;
     private double offPower = 0.0;
-
+    
     //PID
     private TorqueTMP profile;
     private TorquePID armPID;
@@ -46,9 +47,10 @@ public class Arm extends Subsystem {
     private double armAngle;
     private double armVelocity;
     private double positionKff;
+    private double KffA;
 
     public Arm() {
-        armMotor = new Motor(new Jaguar(Ports.ARM_MOTOR_PORT), false);
+        armMotor = new Motor(new Victor(Ports.ARM_MOTOR_PORT), false);
         handMotor = new Motor(new Jaguar(Ports.HAND_MOTOR_PORT), true);
 
         wristSolenoid = new DoubleSolenoid(Ports.WRIST_SOLENOID_A, Ports.WRIST_SOLENOID_B);
@@ -126,7 +128,11 @@ public class Arm extends Subsystem {
             //Calculate Feedforward and PID motor output. We need position feedforward
             //to get the arm neutrally buoyant in any position.
             double feedForward = positionKff * Math.cos(targetAngle);
-            armMotorSpeed = feedForward + armPID.calculate(feedback.getArmVelocity());
+            double pid = armPID.calculate(feedback.getArmVelocity());
+            double ffA = KffA * profile.getCurrentAcceleration();
+            armMotorSpeed = feedForward + pid + ffA;
+            SmartDashboard.putNumber("FFOutput", feedForward);
+            SmartDashboard.putNumber("PIDOutput", pid);
         }
 
         //Output to the robot
@@ -162,7 +168,7 @@ public class Arm extends Subsystem {
 
         //Feedforward Velocity and Acceleration gains
         double kFFV = Constants.Arm_KffV.getDouble();
-        double kFFA = Constants.Arm_KffA.getDouble();
+        KffA = Constants.Arm_KffA.getDouble();
 
         armPID.setFeedForward(kFFV);
 

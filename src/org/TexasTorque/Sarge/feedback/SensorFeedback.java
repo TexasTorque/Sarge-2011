@@ -44,6 +44,12 @@ public class SensorFeedback extends FeedbackSystem {
         armVelocity = armEncoder.getRate();
     }
 
+    public void resetArmAngle() {
+        armEncoder.stop();
+        armEncoder.reset();
+        armEncoder.start();
+    }
+    
     public void loadParams() {
     }
 }

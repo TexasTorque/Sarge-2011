@@ -36,5 +36,7 @@ public abstract class FeedbackSystem implements Runnable {
         return armVelocity;
     }
     
+    public abstract void resetArmAngle();
+    
     public abstract void loadParams();
 }

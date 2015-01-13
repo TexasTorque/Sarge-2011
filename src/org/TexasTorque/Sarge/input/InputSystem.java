@@ -1,6 +1,14 @@
 package org.TexasTorque.Sarge.input;
 
+import org.TexasTorque.Sarge.feedback.FeedbackSystem;
+
 public abstract class InputSystem implements Runnable {
+    
+    FeedbackSystem feedback;
+    
+    public void setFeedBackSystem(FeedbackSystem feed) {
+        feedback = feed;
+    }
 
     //Drivebase
     protected volatile double leftSpeed;
