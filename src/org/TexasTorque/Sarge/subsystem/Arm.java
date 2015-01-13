@@ -1,6 +1,7 @@
 package org.TexasTorque.Sarge.subsystem;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Victor;
@@ -39,7 +40,7 @@ public class Arm extends Subsystem {
     private final double holdPower = 0.1;
     private final double placePower = -0.25;
     private final double offPower = 0.0;
-    
+
     //PID
     private TorqueTMP profile;
     private TorquePV armPV;
@@ -47,6 +48,12 @@ public class Arm extends Subsystem {
     private double armAngle;
     private double armVelocity;
     private double positionKff;
+    private double tunedBatteryVoltage;
+    
+    private double kFFV;
+    private double kFFA;
+    private double kP;
+    private double kV;
 
     public Arm() {
         armMotor = new Motor(new Victor(Ports.ARM_MOTOR_PORT), false);
@@ -57,6 +64,8 @@ public class Arm extends Subsystem {
 
         profile = new TorqueTMP(Constants.Arm_maxV.getDouble(), Constants.Arm_maxA.getDouble());
         armPV = new TorquePV();
+
+        updateGains();
     }
 
     public void update() {
@@ -117,6 +126,13 @@ public class Arm extends Subsystem {
             //Raw joystick value to control the arm motor.
             armMotorSpeed = input.getOverrideArmSpeed();
         } else {
+            //Calibrate FeedForward values for bettery voltage
+            double currentVoltage = DriverStation.getInstance().getBatteryVoltage();
+            double currentFFV = tunedBatteryVoltage * kFFV * (1 / currentVoltage);
+            double currentFFA = tunedBatteryVoltage * kFFA * (1 / currentVoltage);
+            
+            armPV.setGains(kP, kV, currentFFV, currentFFA);
+
             //Generate a new profile and figure out where we should be next.
             double angleError = targetAngle - feedback.getArmAngle();
             profile.generateTrapezoid(angleError, feedback.getArmVelocity());
@@ -124,11 +140,11 @@ public class Arm extends Subsystem {
 
             //Calculate position and velocity control output
             double pv = armPV.calculate(profile, angleError, armVelocity);
-            
+
             //Calculate Feedforward and PID motor output. We need position feedforward
             //to get the arm neutrally buoyant in any position.
             double feedForward = positionKff * Math.cos(targetAngle);
-            
+
             armMotorSpeed = pv + feedForward;
         }
 
@@ -157,20 +173,21 @@ public class Arm extends Subsystem {
     public void updateGains() {
 
         //PV gains
-        double kP = Constants.Arm_Kp.getDouble();
-        double kV = Constants.Arm_Kv.getDouble();
+        kP = Constants.Arm_Kp.getDouble();
+        kV = Constants.Arm_Kv.getDouble();
 
         //Feedforward Velocity and Acceleration gains
-        double kFFV = Constants.Arm_KffV.getDouble();
-        double kFFA = Constants.Arm_KffA.getDouble();
+        kFFV = Constants.Arm_KffV.getDouble();
+        kFFA = Constants.Arm_KffA.getDouble();
 
-        armPV.setGains(kP, kV, kFFV, kFFA);
-        
+        //Battery
+        tunedBatteryVoltage = Constants.tunedBatteryVoltage.getDouble();
+
         //Done Ranges
         armPV.setDoneCycles(Constants.Arm_DoneCycles.getInt());
         armPV.setDoneRange(Constants.Arm_VelocityDoneRange.getDouble());
         armPV.setPositionDoneRange(Constants.Arm_PositionDoneRange.getDouble());
-        
+
         //Position gains
         positionKff = Constants.Arm_positionFF.getDouble();
 
