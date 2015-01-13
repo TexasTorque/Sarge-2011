@@ -37,6 +37,4 @@ public abstract class ControlLoop {
 
         return doneCyclesCount > minDoneCycles;
     }
-
-    public abstract double calculate(double current);
 }
