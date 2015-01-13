@@ -54,6 +54,10 @@ public class TorquePV extends ControlLoop {
 
     public void reset() {
     }
+    
+    public void setPositionDoneRange(double range) {
+        positionDoneRange = range;
+    }
 
     public boolean isDone() {
         if ((Math.abs(profile.getCurrentPosition() - actualPosition) < positionDoneRange)

@@ -166,6 +166,11 @@ public class Arm extends Subsystem {
 
         armPV.setGains(kP, kV, kFFV, kFFA);
         
+        //Done Ranges
+        armPV.setDoneCycles(Constants.Arm_DoneCycles.getInt());
+        armPV.setDoneRange(Constants.Arm_VelocityDoneRange.getDouble());
+        armPV.setPositionDoneRange(Constants.Arm_PositionDoneRange.getDouble());
+        
         //Position gains
         positionKff = Constants.Arm_positionFF.getDouble();
 

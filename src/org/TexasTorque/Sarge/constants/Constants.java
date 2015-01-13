@@ -15,6 +15,10 @@ public class Constants {
     
     public static final Constant Arm_positionFF = new Constant("R_PositionFF", 0.0);
     
+    public static final Constant Arm_DoneCycles = new Constant("R_DoneCycles", 10);
+    public static final Constant Arm_VelocityDoneRange = new Constant("R_VelocityDoneRange", 3.0);
+    public static final Constant Arm_PositionDoneRange = new Constant("R_PositionDoneRange", 2.0);
+    
     //Arm Setpoints
     public final static Constant FLOOR_ANGLE = new Constant("R_FloorAngle", -50.0);
     public final static Constant LOW_ANGLE = new Constant("R_LowAngle", -45.0);
