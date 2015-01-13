@@ -21,15 +21,15 @@ public class Robot extends TorqueIterative {
     Drivebase drivebase;
     Arm arm;
     Compressor compressor;
-    
+
     Parameters params;
-    
+
     int NumCycles = 0;
 
     public void robotInit() {
         params = new Parameters();
         params.load();
-        
+
         driverInput = new DriverInput();
 
         sensorFeedback = new SensorFeedback();
@@ -44,7 +44,7 @@ public class Robot extends TorqueIterative {
     public void teleopInit() {
         params.load();
         arm.updateGains();
-        
+
         input = driverInput;
         feedback = sensorFeedback;
         input.setFeedBackSystem(feedback);
@@ -56,19 +56,15 @@ public class Robot extends TorqueIterative {
         arm.setInputSystem(input);
         arm.setFeedbackSystem(feedback);
         arm.enableOutput(true);
-        
+
         NumCycles = 0;
     }
 
     public void teleopPeriodic() {
-        
 
         drivebase.update();
         drivebase.pushToDashboard();
 
-        
-        
-        
     }
 
     public void teleopContinuous() {
@@ -78,11 +74,11 @@ public class Robot extends TorqueIterative {
         arm.update();
         arm.pushToDashboard();
     }
-    
+
     public void disabledInit() {
         params.load();
         arm.updateGains();
-        
+
         feedback = sensorFeedback;
         input = driverInput;
         input.setFeedBackSystem(feedback);

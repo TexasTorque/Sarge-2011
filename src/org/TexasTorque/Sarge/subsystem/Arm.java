@@ -8,21 +8,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.TexasTorque.Sarge.constants.Constants;
 import org.TexasTorque.Sarge.constants.Ports;
 import org.TexasTorque.Torquelib.component.Motor;
-import org.TexasTorque.Torquelib.controlloop.TorquePID;
 import org.TexasTorque.Torquelib.controlloop.TorquePV;
 import org.TexasTorque.Torquelib.controlloop.TorqueTMP;
 
 public class Arm extends Subsystem {
 
     //Motors
-    private final Motor armMotor;
-    private final Motor handMotor;
+    private Motor armMotor;
+    private Motor handMotor;
     private double armMotorSpeed;
     private double handMotorSpeed;
 
     //Pneumatics
-    private DoubleSolenoid wristSolenoid;
-    private Solenoid handSolenoid;
+    private final DoubleSolenoid wristSolenoid;
+    private final Solenoid handSolenoid;
     private boolean wristDown;
     private boolean handOpen;
 
@@ -35,11 +34,11 @@ public class Arm extends Subsystem {
     public final static byte DOWN = 5;
 
     //Roller Powers
-    private double intakePower = 1.0;
-    private double outtakePower = -1.0;
-    private double holdPower = 0.1;
-    private double placePower = -0.25;
-    private double offPower = 0.0;
+    private final double intakePower = 1.0;
+    private final double outtakePower = -1.0;
+    private final double holdPower = 0.1;
+    private final double placePower = -0.25;
+    private final double offPower = 0.0;
     
     //PID
     private TorqueTMP profile;
@@ -65,7 +64,6 @@ public class Arm extends Subsystem {
         armVelocity = feedback.getArmVelocity();
         targetAngle = input.getTargetAngle();
         isOverride = input.isArmOverride();
-
         state = input.getArmState();
 
         switch (state) {
@@ -120,12 +118,11 @@ public class Arm extends Subsystem {
             armMotorSpeed = input.getOverrideArmSpeed();
         } else {
             //Generate a new profile and figure out where we should be next.
-            
             double angleError = targetAngle - feedback.getArmAngle();
-            
             profile.generateTrapezoid(angleError, feedback.getArmVelocity());
             profile.calculateNextSituation(0.01);
 
+            //Calculate position and velocity control output
             double pv = armPV.calculate(profile, angleError, armVelocity);
             
             //Calculate Feedforward and PID motor output. We need position feedforward

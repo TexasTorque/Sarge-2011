@@ -1,8 +1,6 @@
 package org.TexasTorque.Sarge.feedback;
 
 import edu.wpi.first.wpilibj.CounterBase;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.TexasTorque.Sarge.constants.Ports;
 import org.TexasTorque.Torquelib.component.TorqueEncoder;
 
