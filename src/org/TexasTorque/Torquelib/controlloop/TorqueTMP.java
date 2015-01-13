@@ -40,14 +40,12 @@ public class TorqueTMP {
         return currentAcceleration;
     }
     
-    public void generateTrapezoid(double targetPosition, double realPosition, double realSpeed) {
+    public void generateTrapezoid(double distance, double realSpeed) {
 
-        double positionError = targetPosition - realPosition;
-
-        if (Math.abs(positionError) < 0.1) {
+        if (Math.abs(distance) < 0.1) {
             return;
-        } else if (positionError < 0.0) {
-            generateTrapezoid(-targetPosition, -realPosition, -realSpeed);
+        } else if (distance < 0.0) {
+            generateTrapezoid(-distance, -realSpeed);
             acceleration *= -1;
             deceleration *= -1;
             return;
@@ -72,7 +70,7 @@ public class TorqueTMP {
         // x * 2 * acceleration = 2Vmax^2 - Vnow^2
         // 2Vmax^2 = 2 * x * acceleration + Vnow^2
         // Vmax = sqrt( (2 * x * acceleration + Vnow^2) / 2 )
-        double maximumPossibleSpeed = Math.sqrt((2 * maxAllowedAcceleration * positionError + realSpeed * realSpeed) / 2);
+        double maximumPossibleSpeed = Math.sqrt((2 * maxAllowedAcceleration * distance + realSpeed * realSpeed) / 2);
         //Limit the max speed if it is higher than we want the system to ever move.
         topSpeed = Math.min(maximumPossibleSpeed, maxAllowedVelocity);
 
@@ -93,13 +91,9 @@ public class TorqueTMP {
         double decelerationDistance = -1 * (topSpeed * topSpeed) / (2 * deceleration);
 
         //Cruising distance is the distance we do not spend accelerating or decelerating.
-        double cruiseDistance = positionError - accelerationDistance - decelerationDistance;
+        double cruiseDistance = distance - accelerationDistance - decelerationDistance;
         //Cruise time is cruising distance divided by the speed at which we cruise.
         cruiseTime = cruiseDistance / topSpeed;
-
-        //Our target position right now is our current position because thats what
-        //the profile was based on.
-        currentPosition = realPosition;
     }
 
     /**

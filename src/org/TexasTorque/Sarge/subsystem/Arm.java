@@ -120,10 +120,13 @@ public class Arm extends Subsystem {
             armMotorSpeed = input.getOverrideArmSpeed();
         } else {
             //Generate a new profile and figure out where we should be next.
-            profile.generateTrapezoid(targetAngle, feedback.getArmAngle(), feedback.getArmVelocity());
+            
+            double angleError = targetAngle - feedback.getArmAngle();
+            
+            profile.generateTrapezoid(angleError, feedback.getArmVelocity());
             profile.calculateNextSituation(0.01);
 
-            double pv = armPV.calculate(profile, armAngle, armVelocity);
+            double pv = armPV.calculate(profile, angleError, armVelocity);
             
             //Calculate Feedforward and PID motor output. We need position feedforward
             //to get the arm neutrally buoyant in any position.
