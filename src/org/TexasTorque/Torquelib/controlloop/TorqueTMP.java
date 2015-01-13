@@ -135,6 +135,12 @@ public class TorqueTMP {
         currentAcceleration = acceleration;
         currentPosition += currentVelocity * dt + 0.5 * currentAcceleration * dt * dt;
         currentVelocity += currentAcceleration * dt;
+        
+        if (currentVelocity > topSpeed) {
+            currentVelocity = topSpeed;
+        } else if (currentVelocity < -topSpeed) {
+            currentVelocity = -topSpeed;
+        }
     }
 
     /**
@@ -157,6 +163,12 @@ public class TorqueTMP {
         currentAcceleration = deceleration;
         currentPosition += currentVelocity * dt + 0.5 * deceleration * dt * dt;
         currentVelocity += currentAcceleration * dt;
+        
+        if (currentVelocity > topSpeed) {
+            currentVelocity = topSpeed;
+        } else if (currentVelocity < -topSpeed) {
+            currentVelocity = -topSpeed;
+        }
     }
 
     public String toString() {
