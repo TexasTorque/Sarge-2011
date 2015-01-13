@@ -5,8 +5,7 @@ import org.TexasTorque.Torquelib.util.Parameters.Constant;
 public class Constants {
     //Arm PIV
     public static final Constant Arm_Kp = new Constant("R_ArmKp", 0.0);
-    public static final Constant Arm_Ki = new Constant("R_ArmKi", 0.0);
-    public static final Constant Arm_Kd = new Constant("R_ArmKd", 0.0);
+    public static final Constant Arm_Kv = new Constant("R_ArmKv", 0.0);
     public static final Constant Arm_Kff = new Constant("R_ArmKff", 0.0);
     
     public static final Constant Arm_KffV = new Constant("R_ArmKffV", 0.0);

@@ -9,6 +9,7 @@ import org.TexasTorque.Sarge.constants.Constants;
 import org.TexasTorque.Sarge.constants.Ports;
 import org.TexasTorque.Torquelib.component.Motor;
 import org.TexasTorque.Torquelib.controlloop.TorquePID;
+import org.TexasTorque.Torquelib.controlloop.TorquePV;
 import org.TexasTorque.Torquelib.controlloop.TorqueTMP;
 
 public class Arm extends Subsystem {
@@ -42,12 +43,11 @@ public class Arm extends Subsystem {
     
     //PID
     private TorqueTMP profile;
-    private TorquePID armPID;
+    private TorquePV armPV;
     private double targetAngle;
     private double armAngle;
     private double armVelocity;
     private double positionKff;
-    private double KffA;
 
     public Arm() {
         armMotor = new Motor(new Victor(Ports.ARM_MOTOR_PORT), false);
@@ -57,7 +57,7 @@ public class Arm extends Subsystem {
         handSolenoid = new Solenoid(Ports.HAND_SOLENOID);
 
         profile = new TorqueTMP(Constants.Arm_maxV.getDouble(), Constants.Arm_maxA.getDouble());
-        armPID = new TorquePID();
+        armPV = new TorquePV();
     }
 
     public void update() {
@@ -122,17 +122,14 @@ public class Arm extends Subsystem {
             //Generate a new profile and figure out where we should be next.
             profile.generateTrapezoid(targetAngle, feedback.getArmAngle(), feedback.getArmVelocity());
             profile.calculateNextSituation(0.01);
-            //Set the next veloctity as our target for the Velocity PID controller.
-            armPID.setSetpoint(profile.getCurrentVelocity());
 
+            double pv = armPV.calculate(profile, armAngle, armVelocity);
+            
             //Calculate Feedforward and PID motor output. We need position feedforward
             //to get the arm neutrally buoyant in any position.
             double feedForward = positionKff * Math.cos(targetAngle);
-            double pid = armPID.calculate(feedback.getArmVelocity());
-            double ffA = KffA * profile.getCurrentAcceleration();
-            armMotorSpeed = feedForward + pid + ffA;
-            SmartDashboard.putNumber("FFOutput", feedForward);
-            SmartDashboard.putNumber("PIDOutput", pid);
+            
+            armMotorSpeed = pv + feedForward;
         }
 
         //Output to the robot
@@ -159,19 +156,16 @@ public class Arm extends Subsystem {
 
     public void updateGains() {
 
-        //PID gains
+        //PV gains
         double kP = Constants.Arm_Kp.getDouble();
-        double kI = Constants.Arm_Ki.getDouble();
-        double kD = Constants.Arm_Kd.getDouble();
-
-        armPID.setPIDGains(kP, kI, kD);
+        double kV = Constants.Arm_Kv.getDouble();
 
         //Feedforward Velocity and Acceleration gains
         double kFFV = Constants.Arm_KffV.getDouble();
-        KffA = Constants.Arm_KffA.getDouble();
+        double kFFA = Constants.Arm_KffA.getDouble();
 
-        armPID.setFeedForward(kFFV);
-
+        armPV.setGains(kP, kV, kFFV, kFFA);
+        
         //Position gains
         positionKff = Constants.Arm_positionFF.getDouble();
 
