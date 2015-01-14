@@ -1,5 +1,7 @@
 package org.TexasTorque.Torquelib.controlloop;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 /**
  * Created by Gijs on 12/31/2014.
  */
@@ -76,6 +78,11 @@ public class TorqueTMP {
         //Calculate the time we will spend accelerating.
         acceleration = maxAllowedAcceleration;
         accelerationTime = Math.max(((topSpeed - realSpeed) / acceleration), 0.0);
+        System.out.println("topSpeed" + topSpeed);
+        System.out.println("realSpeed" + realSpeed);
+        System.out.println("accel" + acceleration);
+        System.out.println("top - real" + (topSpeed - realSpeed));
+        System.out.println("");
         //Vf^2 = V^2 + 2 * a * dX
         //Vf^2 - v^2 = 2 * a * dX
         //dX = (Vf^2 - V^2) / (2 * a)
@@ -97,6 +104,8 @@ public class TorqueTMP {
         } else {
             cruiseTime = 0.0;
         }
+
+        SmartDashboard.putNumber("topspeed", topSpeed);
     }
 
     /**
@@ -106,20 +115,25 @@ public class TorqueTMP {
      * @param dt
      */
     public void calculateNextSituation(double dt) {
+        System.out.println(accelerationTime);
         if (dt < accelerationTime) {
             accelerate(dt);
+            System.out.println("A\n");
         } else if (dt < (accelerationTime + cruiseTime)) {
             accelerate(accelerationTime);
             cruise(dt - accelerationTime);
+            System.out.println("B\n");
         } else if (dt < (accelerationTime + cruiseTime + decelerationTime)) {
             accelerate(accelerationTime);
             cruise(cruiseTime);
             decelerate(dt - accelerationTime - cruiseTime);
+            System.out.println("C\n");
         } else {
             accelerate(accelerationTime);
             cruise(cruiseTime);
             decelerate(decelerationTime);
             currentAcceleration = 0.0;
+            System.out.println("D\n");
         }
     }
 
@@ -130,14 +144,26 @@ public class TorqueTMP {
      */
     private void accelerate(double dt) {
         currentAcceleration = acceleration;
-        currentPosition += currentVelocity * dt + 0.5 * currentAcceleration * dt * dt;
-        currentVelocity += currentAcceleration * dt;
+        currentPosition += (currentVelocity * dt + 0.5 * currentAcceleration * dt * dt);
+
+        System.out.println("A: " + currentAcceleration);
+        System.out.println("dt: " + dt);
+        System.out.println("A * dt: " + currentAcceleration * dt);
+        System.out.println("V: " + currentVelocity);
+        System.out.println("V + A * dt: " + currentVelocity);
+        currentVelocity += (currentAcceleration * dt);
 
         if (currentVelocity > topSpeed) {
             currentVelocity = topSpeed;
         } else if (currentVelocity < -topSpeed) {
             currentVelocity = -topSpeed;
         }
+
+        SmartDashboard.putNumber("currentVelocity", currentVelocity);
+        SmartDashboard.putNumber("targetAccel", currentAcceleration);
+        SmartDashboard.putNumber("time", dt);
+        SmartDashboard.putString("LastUpdated", "Accelerate");
+        SmartDashboard.putString("VelocityState", (new Double(currentVelocity)).toString());
     }
 
     /**
@@ -147,8 +173,7 @@ public class TorqueTMP {
      */
     private void cruise(double dt) {
         currentAcceleration = 0.0;
-        currentPosition += currentVelocity * dt + 0.5 * currentAcceleration * dt * dt;
-        currentVelocity += currentAcceleration * dt;
+        currentPosition += currentVelocity * dt;
     }
 
     /**
@@ -158,14 +183,17 @@ public class TorqueTMP {
      */
     private void decelerate(double dt) {
         currentAcceleration = deceleration;
-        currentPosition += currentVelocity * dt + 0.5 * deceleration * dt * dt;
-        currentVelocity += currentAcceleration * dt;
+        currentPosition += (currentVelocity * dt + 0.5 * deceleration * dt * dt);
+        currentVelocity += (currentAcceleration * dt);
 
         if (currentVelocity > topSpeed) {
             currentVelocity = topSpeed;
         } else if (currentVelocity < -topSpeed) {
             currentVelocity = -topSpeed;
         }
+
+        SmartDashboard.putString("LastUpdated", "Decelerate");
+        SmartDashboard.putString("VelocityState", (new Double(currentVelocity)).toString());
     }
 
     public String toString() {
