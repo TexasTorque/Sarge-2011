@@ -49,7 +49,8 @@ public class Arm extends Subsystem {
     private double armVelocity;
     private double positionKff;
     private double tunedBatteryVoltage;
-    
+    private double angleDeadband;
+
     private double kFFV;
     private double kFFA;
     private double kP;
@@ -130,22 +131,25 @@ public class Arm extends Subsystem {
             double currentVoltage = DriverStation.getInstance().getBatteryVoltage();
             double currentFFV = tunedBatteryVoltage * kFFV * (1 / currentVoltage);
             double currentFFA = tunedBatteryVoltage * kFFA * (1 / currentVoltage);
-            
+
             armPV.setGains(kP, kV, currentFFV, currentFFA);
 
             //Generate a new profile and figure out where we should be next.
             double angleError = targetAngle - feedback.getArmAngle();
-            profile.generateTrapezoid(angleError, feedback.getArmVelocity());
-            profile.calculateNextSituation(0.01);
+            double pvOutput = 0.0;
+            if (Math.abs(angleError) > angleDeadband) {
+                profile.generateTrapezoid(angleError, feedback.getArmVelocity());
+                profile.calculateNextSituation(0.01);
 
-            //Calculate position and velocity control output
-            double pv = armPV.calculate(profile, angleError, armVelocity);
+                //Calculate position and velocity control output
+                pvOutput = armPV.calculate(profile, angleError, armVelocity);
+            }
 
             //Calculate Feedforward and PID motor output. We need position feedforward
             //to get the arm neutrally buoyant in any position.
-            double feedForward = positionKff * Math.cos(targetAngle);
+            double feedForward = positionKff * Math.cos(Math.toRadians(targetAngle));
 
-            armMotorSpeed = pv + feedForward;
+            armMotorSpeed = pvOutput + feedForward;
         }
 
         //Output to the robot
@@ -193,5 +197,8 @@ public class Arm extends Subsystem {
 
         //Reinitialize the TMP generator with new max V and A.
         profile = new TorqueTMP(Constants.Arm_maxV.getDouble(), Constants.Arm_maxA.getDouble());
+
+        //Deadband
+        angleDeadband = Constants.angleDeadband.getDouble();
     }
 }
