@@ -14,13 +14,13 @@ public class SensorFeedback extends FeedbackSystem {
     private TorqueEncoder armEncoder;
     private double bottomAngle = -66;
     private double degreesPerClick = 1.44;
-    
+
     public SensorFeedback() {
         leftDriveEncoder = new TorqueEncoder(4, 5, false, CounterBase.EncodingType.k2X);
         leftDriveEncoder.start();
         rightDriveEncoder = new TorqueEncoder(2, 3, true, CounterBase.EncodingType.k2X);
         rightDriveEncoder.start();
-        
+
         armEncoder = new TorqueEncoder(Ports.ARM_ENCODER_A, Ports.ARM_ENCODER_B, false, CounterBase.EncodingType.k2X);
         armEncoder.start();
     }
@@ -37,9 +37,14 @@ public class SensorFeedback extends FeedbackSystem {
 
         //Arm
         armEncoder.calc();
-        
+
         armAngle = armEncoder.getDistance() * degreesPerClick + bottomAngle;
-        armVelocity = armEncoder.getRate();
+        double newArmVelocity = armEncoder.getAverageRate();
+
+        if (!Double.isNaN(newArmVelocity)) {
+            armVelocity = newArmVelocity;
+            System.out.println("Threw out bad rate!");
+        }
     }
 
     public void resetArmAngle() {
@@ -47,7 +52,7 @@ public class SensorFeedback extends FeedbackSystem {
         armEncoder.reset();
         armEncoder.start();
     }
-    
+
     public void loadParams() {
     }
 }

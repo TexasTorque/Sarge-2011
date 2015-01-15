@@ -63,7 +63,7 @@ public class TorqueEncoder extends Encoder {
      * @return The rate.
      */
     public double getAverageRate() {
-        return averageRate;
+        return 1 / super.getPeriod();
     }
 
     /**
