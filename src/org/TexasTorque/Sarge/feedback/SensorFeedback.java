@@ -39,10 +39,11 @@ public class SensorFeedback extends FeedbackSystem {
         armEncoder.calc();
 
         armAngle = armEncoder.getDistance() * degreesPerClick + bottomAngle;
-        double newArmVelocity = armEncoder.getAverageRate();
+        double newArmVelocity = armEncoder.getRate();
 
         if (!Double.isNaN(newArmVelocity)) {
             armVelocity = newArmVelocity;
+        } else {
             System.out.println("Threw out bad rate!");
         }
     }
