@@ -44,12 +44,17 @@ public class Arm extends Subsystem {
     //PID
     private TorqueTMP profile;
     private TorquePV armPV;
+
+    double timeOnProfile;
+    double profileStartAngle;
+
     private double targetAngle;
+    private double previousTargetAngle;
     private double armAngle;
     private double armVelocity;
+
     private double positionKff;
     private double tunedBatteryVoltage;
-    private double angleDeadband;
 
     private double kFFV;
     private double kFFA;
@@ -66,6 +71,9 @@ public class Arm extends Subsystem {
         profile = new TorqueTMP(Constants.Arm_maxV.getDouble(), Constants.Arm_maxA.getDouble());
         armPV = new TorquePV();
 
+        previousTargetAngle = 0.0;
+        targetAngle = Constants.RETRACT_ANGLE.getDouble();
+        
         updateGains();
     }
 
@@ -123,6 +131,13 @@ public class Arm extends Subsystem {
                 break;
         }
 
+        double angleError = targetAngle - feedback.getArmAngle();
+        
+        if (targetAngle != previousTargetAngle) {
+            previousTargetAngle = targetAngle;
+            generateProfile(angleError);
+        }
+
         if (isOverride) {
             //Raw joystick value to control the arm motor.
             armMotorSpeed = input.getOverrideArmSpeed();
@@ -131,22 +146,12 @@ public class Arm extends Subsystem {
             double currentVoltage = DriverStation.getInstance().getBatteryVoltage();
             double currentFFV = tunedBatteryVoltage * kFFV * (1 / currentVoltage);
             double currentFFA = tunedBatteryVoltage * kFFA * (1 / currentVoltage);
-
             armPV.setGains(kP, kV, currentFFV, currentFFA);
 
-            //Generate a new profile and figure out where we should be next.
-            double angleError = targetAngle - feedback.getArmAngle();
-            double pvOutput = 0.0;
-            if (Math.abs(angleError) > angleDeadband) {
-                profile.generateTrapezoid(angleError, feedback.getArmVelocity());
-                profile.calculateNextSituation(0.01);
-
-                //Calculate position and velocity control output
-                pvOutput = armPV.calculate(profile, angleError, armVelocity);
-            }
-
-            //Calculate Feedforward and PID motor output. We need position feedforward
-            //to get the arm neutrally buoyant in any position.
+            profile.calculateNextSituation(timeOnProfile);
+            timeOnProfile += 0.01;
+            
+            double pvOutput = armPV.calculate(profile, feedback.getArmAngle() - profileStartAngle, armVelocity);
             double feedForward = positionKff * Math.cos(Math.toRadians(targetAngle));
 
             armMotorSpeed = pvOutput + feedForward;
@@ -160,6 +165,12 @@ public class Arm extends Subsystem {
             handMotor.set(handMotorSpeed);
             armMotor.set(armMotorSpeed);
         }
+    }
+
+    private void generateProfile(double distance) {
+        profile.generateTrapezoid(distance, feedback.getArmVelocity());
+        profileStartAngle = feedback.getArmAngle();
+        timeOnProfile = 0.0;
     }
 
     public void pushToDashboard() {
@@ -197,8 +208,5 @@ public class Arm extends Subsystem {
 
         //Reinitialize the TMP generator with new max V and A.
         profile = new TorqueTMP(Constants.Arm_maxV.getDouble(), Constants.Arm_maxA.getDouble());
-
-        //Deadband
-        angleDeadband = Constants.angleDeadband.getDouble();
     }
 }
