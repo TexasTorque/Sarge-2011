@@ -72,7 +72,7 @@ public class GenericController extends Joystick {
         if (isLogitechController) {
             return scaleInput(getRawAxis(4));
         } else {
-            return scaleInput(getRawAxis(6));
+            return scaleInput(getRawAxis(5));
         }
     }
 
@@ -80,7 +80,7 @@ public class GenericController extends Joystick {
         if (isLogitechController) {
             return scaleInput(getRawAxis(3));
         } else {
-            return scaleInput(getRawAxis(5));
+            return scaleInput(getRawAxis(4));
         }
     }
 
@@ -128,7 +128,7 @@ public class GenericController extends Joystick {
         if (isLogitechController) {
             return getRawButton(8);
         } else {
-            return (getRawAxis(4) > 0.5);
+            return (getRawAxis(3) < -0.2);
         }
     }
 
