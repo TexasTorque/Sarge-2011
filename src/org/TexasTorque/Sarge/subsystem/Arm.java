@@ -54,12 +54,6 @@ public class Arm extends Subsystem {
     private double armVelocity;
 
     private double positionKff;
-    private double tunedBatteryVoltage;
-
-    private double kFFV;
-    private double kFFA;
-    private double kP;
-    private double kV;
 
     public Arm() {
         armMotor = new Motor(new Victor(Ports.ARM_MOTOR_PORT), false);
@@ -139,15 +133,8 @@ public class Arm extends Subsystem {
         }
 
         if (isOverride) {
-            //Raw joystick value to control the arm motor.
             armMotorSpeed = input.getOverrideArmSpeed();
         } else {
-            //Calibrate FeedForward values for bettery voltage
-            double currentVoltage = DriverStation.getInstance().getBatteryVoltage();
-            double currentFFV = tunedBatteryVoltage * kFFV * (1 / currentVoltage);
-            double currentFFA = tunedBatteryVoltage * kFFA * (1 / currentVoltage);
-            armPV.setGains(kP, kV, currentFFV, currentFFA);
-
             timeOnProfile += 0.01;
             profile.calculateNextSituation(timeOnProfile);
             
@@ -188,15 +175,18 @@ public class Arm extends Subsystem {
     public void updateGains() {
 
         //PV gains
-        kP = Constants.Arm_Kp.getDouble();
-        kV = Constants.Arm_Kv.getDouble();
+        double kP = Constants.Arm_Kp.getDouble();
+        double kV = Constants.Arm_Kv.getDouble();
 
         //Feedforward Velocity and Acceleration gains
-        kFFV = Constants.Arm_KffV.getDouble();
-        kFFA = Constants.Arm_KffA.getDouble();
+        double kFFV = Constants.Arm_KffV.getDouble();
+        double kFFA = Constants.Arm_KffA.getDouble();
+        
+        armPV.setGains(kP, kV, kFFV, kFFA);
 
         //Battery
-        tunedBatteryVoltage = Constants.tunedBatteryVoltage.getDouble();
+        double tunedBatteryVoltage = Constants.tunedBatteryVoltage.getDouble();
+        armPV.setTunedVoltage(tunedBatteryVoltage);
 
         //Done Ranges
         armPV.setDoneCycles(Constants.Arm_DoneCycles.getInt());

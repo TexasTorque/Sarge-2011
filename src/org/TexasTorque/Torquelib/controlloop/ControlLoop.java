@@ -1,5 +1,7 @@
 package org.TexasTorque.Torquelib.controlloop;
 
+import edu.wpi.first.wpilibj.DriverStation;
+
 public abstract class ControlLoop {
 
     protected double setPoint;
@@ -8,10 +10,14 @@ public abstract class ControlLoop {
     protected double doneRange;
     protected int minDoneCycles;
     protected int doneCyclesCount;
+    
+    protected DriverStation ds;
+    protected double tunedVoltage;
 
     public ControlLoop() {
         setPoint = 0;
         doneRange = 0;
+        ds = DriverStation.getInstance();
     }
 
     public void setSetpoint(double set) {
@@ -24,6 +30,10 @@ public abstract class ControlLoop {
 
     public void setDoneCycles(int cycles) {
         minDoneCycles = cycles;
+    }
+    
+    public void setTunedVoltage(double volts) {
+        tunedVoltage = volts;
     }
 
     public boolean isDone() {

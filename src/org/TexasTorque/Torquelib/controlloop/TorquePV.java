@@ -22,6 +22,8 @@ public class TorquePV extends ControlLoop {
     }
 
     public double calculate(TorqueTMP tmProfile, double currentPosition, double currentVelocity) {
+        double voltageAdjustment = tunedVoltage / ds.getBatteryVoltage();
+        
         profile = tmProfile;
         setPoint = profile.getCurrentVelocity();
         currentValue = currentVelocity;
@@ -30,17 +32,17 @@ public class TorquePV extends ControlLoop {
 
         //Position P
         double error = profile.getCurrentPosition() - currentPosition;
-        output += (error * kP);
+        output += (error * kP * voltageAdjustment);
 
         //Velocity P
         double velocityError = profile.getCurrentVelocity() - currentVelocity;
-        output += (velocityError * kV);
+        output += (velocityError * kV * voltageAdjustment);
 
         //Velocity FeedForward
-        output += (profile.getCurrentVelocity() * kFFV);
+        output += (profile.getCurrentVelocity() * kFFV * voltageAdjustment);
 
         //Acceleration FeedForward
-        output += (profile.getCurrentAcceleration() * kFFA);
+        output += (profile.getCurrentAcceleration() * kFFA * voltageAdjustment);
 
         return output;
     }
