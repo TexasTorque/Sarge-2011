@@ -45,9 +45,6 @@ public class Arm extends Subsystem {
     private TorqueTMP profile;
     private TorquePV armPV;
 
-    double timeOnProfile;
-    double profileStartAngle;
-
     private double targetAngle;
     private double previousTargetAngle;
     private double armAngle;
@@ -125,20 +122,17 @@ public class Arm extends Subsystem {
                 break;
         }
 
-        double angleError = targetAngle - feedback.getArmAngle();
-        
         if (targetAngle != previousTargetAngle) {
             previousTargetAngle = targetAngle;
-            generateProfile(angleError);
+            generateProfile();
         }
 
         if (isOverride) {
             armMotorSpeed = input.getOverrideArmSpeed();
         } else {
-            timeOnProfile += 0.01;
-            profile.calculateNextSituation(timeOnProfile);
+            profile.calculateNextSituation();
             
-            double pvOutput = armPV.calculate(profile, feedback.getArmAngle() - profileStartAngle, armVelocity);
+            double pvOutput = armPV.calculate(profile, armAngle, armVelocity);
             double feedForward = positionKff * Math.cos(Math.toRadians(targetAngle));
 
             armMotorSpeed = pvOutput + feedForward;
@@ -154,10 +148,8 @@ public class Arm extends Subsystem {
         }
     }
 
-    private void generateProfile(double distance) {
-        profile.generateTrapezoid(distance, feedback.getArmVelocity());
-        profileStartAngle = feedback.getArmAngle();
-        timeOnProfile = 0.0;
+    private void generateProfile() {
+        profile.generateTrapezoid(targetAngle, feedback.getArmAngle(), feedback.getArmVelocity());
     }
 
     public void pushToDashboard() {

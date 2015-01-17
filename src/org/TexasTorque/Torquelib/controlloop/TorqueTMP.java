@@ -1,7 +1,5 @@
 package org.TexasTorque.Torquelib.controlloop;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 /**
  * Created by Gijs on 12/31/2014.
  */
@@ -41,14 +39,18 @@ public class TorqueTMP {
         return currentAcceleration;
     }
 
-    public void generateTrapezoid(double distance, double realSpeed) {
-
-        if (Math.abs(distance) < 0.1) {
+    public void generateTrapezoid(double targetPosition, double realPosition, double realSpeed) {
+        
+        double positionError = targetPosition - realPosition;
+        
+        if (Math.abs(positionError) < 0.1) {
             return;
-        } else if (distance < 0.0) {
-            generateTrapezoid(-distance, -realSpeed);
+        } else if (positionError < 0.0) {
+            generateTrapezoid(-targetPosition, -realPosition, -realSpeed);
             acceleration *= -1;
             deceleration *= -1;
+            currentPosition *= -1;
+            currentVelocity *= -1;
             return;
         }
 
@@ -71,7 +73,7 @@ public class TorqueTMP {
         // x * 2 * acceleration = 2Vmax^2 - Vnow^2
         // 2Vmax^2 = 2 * x * acceleration + Vnow^2
         // Vmax = sqrt( (2 * x * acceleration + Vnow^2) / 2 )
-        double maximumPossibleSpeed = Math.sqrt((2 * maxAllowedAcceleration * distance + realSpeed * realSpeed) / 2);
+        double maximumPossibleSpeed = Math.sqrt((2 * maxAllowedAcceleration * positionError + realSpeed * realSpeed) / 2);
         //Limit the max speed if it is higher than we want the system to ever move.
         topSpeed = Math.min(maximumPossibleSpeed, maxAllowedVelocity);
 
@@ -93,13 +95,16 @@ public class TorqueTMP {
         double decelerationDistance = -1 * (topSpeed * topSpeed) / (2 * deceleration);
 
         //Cruising distance is the distance we do not spend accelerating or decelerating.
-        double cruiseDistance = distance - accelerationDistance - decelerationDistance;
+        double cruiseDistance = positionError - accelerationDistance - decelerationDistance;
         //Cruise time is cruising distance divided by the speed at which we cruise.
         if (topSpeed != 0) {
             cruiseTime = cruiseDistance / topSpeed;
         } else {
             cruiseTime = 0.0;
         }
+        
+        currentPosition = realPosition;
+        currentVelocity = realSpeed;
     }
 
     /**
@@ -108,25 +113,33 @@ public class TorqueTMP {
      *
      * @param dt
      */
-    public void calculateNextSituation(double dt) {
+    public void calculateNextSituation() {
         
-        currentPosition = 0.0;
-        currentVelocity = 0.0;
-        
-        if (dt < accelerationTime) {
-            accelerate(dt);
-        } else if (dt < (accelerationTime + cruiseTime)) {
+        if (accelerationTime > 0.1) {
+            accelerate(0.01);
+            accelerationTime -= 0.01;
+        } else if ((accelerationTime + cruiseTime) > 0.01) {
             accelerate(accelerationTime);
-            cruise(dt - accelerationTime);
-        } else if (dt < (accelerationTime + cruiseTime + decelerationTime)) {
+            cruise(0.01 - accelerationTime);
+            
+            cruiseTime -= (0.01 - accelerationTime);
+            accelerationTime = 0.0;
+        } else if ((accelerationTime + cruiseTime + decelerationTime) > 0.01) {
             accelerate(accelerationTime);
             cruise(cruiseTime);
-            decelerate(dt - accelerationTime - cruiseTime);
+            decelerate(0.01 - accelerationTime - cruiseTime);
+            
+            decelerationTime -= (0.01 - accelerationTime - cruiseTime);
+            accelerationTime = 0.0;
+            cruiseTime = 0.0;
         } else {
             accelerate(accelerationTime);
             cruise(cruiseTime);
             decelerate(decelerationTime);
-            currentAcceleration = 0.0;
+            
+            accelerationTime = 0.0;
+            cruiseTime = 0.0;
+            decelerationTime = 0.0;
         }
     }
 
