@@ -109,6 +109,10 @@ public class TorqueTMP {
      * @param dt
      */
     public void calculateNextSituation(double dt) {
+        
+        currentPosition = 0.0;
+        currentVelocity = 0.0;
+        
         if (dt < accelerationTime) {
             accelerate(dt);
         } else if (dt < (accelerationTime + cruiseTime)) {

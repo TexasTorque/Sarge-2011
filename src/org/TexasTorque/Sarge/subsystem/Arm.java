@@ -148,8 +148,8 @@ public class Arm extends Subsystem {
             double currentFFA = tunedBatteryVoltage * kFFA * (1 / currentVoltage);
             armPV.setGains(kP, kV, currentFFV, currentFFA);
 
-            profile.calculateNextSituation(timeOnProfile);
             timeOnProfile += 0.01;
+            profile.calculateNextSituation(timeOnProfile);
             
             double pvOutput = armPV.calculate(profile, feedback.getArmAngle() - profileStartAngle, armVelocity);
             double feedForward = positionKff * Math.cos(Math.toRadians(targetAngle));
