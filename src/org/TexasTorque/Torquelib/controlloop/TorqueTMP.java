@@ -132,6 +132,7 @@ public class TorqueTMP {
             decelerationTime -= (0.01 - accelerationTime - cruiseTime);
             accelerationTime = 0.0;
             cruiseTime = 0.0;
+            currentAcceleration = 0.0;
         } else {
             accelerate(accelerationTime);
             cruise(cruiseTime);
@@ -140,6 +141,7 @@ public class TorqueTMP {
             accelerationTime = 0.0;
             cruiseTime = 0.0;
             decelerationTime = 0.0;
+            currentAcceleration = 0.0;
         }
     }
 

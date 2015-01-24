@@ -36,6 +36,9 @@ public class Robot extends TorqueIterative {
 
         drivebase = new Drivebase();
         arm = new Arm();
+        arm.setFeedbackSystem(sensorFeedback);
+        arm.setInputSystem(driverInput);
+        arm.updateGains();
 
         compressor = new Compressor(13, 1);
         compressor.start();

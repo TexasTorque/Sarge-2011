@@ -64,8 +64,6 @@ public class Arm extends Subsystem {
 
         previousTargetAngle = 0.0;
         targetAngle = Constants.RETRACT_ANGLE.getDouble();
-        
-        updateGains();
     }
 
     public synchronized void update() {
@@ -158,10 +156,12 @@ public class Arm extends Subsystem {
         SmartDashboard.putNumber("HandRollerSpeed", handMotorSpeed);
         SmartDashboard.putNumber("ArmMotorSpeed", armMotorSpeed);
         SmartDashboard.putNumber("ArmState", state);
-        SmartDashboard.putNumber("TargetAngle", targetAngle);
+        SmartDashboard.putNumber("SetpointAngle", targetAngle);
         SmartDashboard.putNumber("Angle", armAngle);
         SmartDashboard.putNumber("Velocity", armVelocity);
+        SmartDashboard.putNumber("TargetAcceleration", profile.getCurrentAcceleration());
         SmartDashboard.putNumber("TargetVelocity", profile.getCurrentVelocity());
+        SmartDashboard.putNumber("TargetPosition", profile.getCurrentPosition());
     }
 
     public void updateGains() {
@@ -190,5 +190,6 @@ public class Arm extends Subsystem {
 
         //Reinitialize the TMP generator with new max V and A.
         profile = new TorqueTMP(Constants.Arm_maxV.getDouble(), Constants.Arm_maxA.getDouble());
+        generateProfile();
     }
 }
